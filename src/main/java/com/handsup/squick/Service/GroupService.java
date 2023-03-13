@@ -1,20 +1,25 @@
 package com.handsup.squick.Service;
 
 import com.handsup.squick.Dao.GroupDao;
+import com.handsup.squick.Dao.UserDao;
 import com.handsup.squick.Dto.GroupDto.GroupCreateDto;
 import com.handsup.squick.Dto.GroupDto.GroupDeleteDto;
 import com.handsup.squick.Dto.GroupDto.GroupModifyDto;
+import com.handsup.squick.Dto.GroupDto.GroupReadDto;
 import com.handsup.squick.Repository.GroupJpaRepository;
+import com.handsup.squick.Repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class GroupService {
     private final GroupJpaRepository groupJpaRepository;
-    private final UserService userService;
+    private final UserJpaRepository userJpaRepository;
 
     public void groupCreate(GroupCreateDto dto){
         GroupDao dao = GroupDao.builder()
@@ -79,4 +84,13 @@ public class GroupService {
         return true;
     }
 
+    public List<String> getUsers(GroupReadDto dto){
+        List<UserDao> userDaos = userJpaRepository.findByGroupName(dto.getGroupName());
+
+        List<String> list = new ArrayList<>();
+        for(int i = 0; i < userDaos.size(); i++)
+            list.add(userDaos.get(i).getUserId());
+
+        return list;
+    }
 }

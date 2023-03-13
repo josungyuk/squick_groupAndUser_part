@@ -10,4 +10,6 @@ public interface UserJpaRepository extends JpaRepository<UserDao, Long> {
     List<UserDao> findByGroupNameAndUserId(String groupName, String userId);
 
     List<UserDao> deleteByUserIdAndGroupName(String userName, String groupName);
+
+    List<UserDao> findByGroupName(String groupName);
 }

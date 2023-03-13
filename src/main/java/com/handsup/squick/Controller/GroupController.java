@@ -5,10 +5,13 @@ import com.handsup.squick.Dto.GroupDto.GroupCreateDto;
 import com.handsup.squick.Dto.GroupDto.GroupDeleteDto;
 import com.handsup.squick.Dto.GroupDto.GroupModifyDto;
 import com.handsup.squick.Dto.GroupDto.GroupReadDto;
+import com.handsup.squick.Dto.UserDto.UserReadDto;
 import com.handsup.squick.Service.GroupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,5 +44,12 @@ public class GroupController {
     public GroupDao read(@RequestBody GroupReadDto dto){
 
         return groupService.groupRead(dto.getGroupName());
+    }
+
+    @GetMapping("/getUsers")
+    public List<String> getUsers(@RequestBody GroupReadDto dto){
+        List<String> list = getUsers(dto);
+
+        return list;
     }
 }
