@@ -1,96 +1,93 @@
 package com.handsup.squick.Service;
 
-import com.handsup.squick.Dao.GroupDao;
-import com.handsup.squick.Dao.UserDao;
+import com.handsup.squick.Entity.Attendance;
+import com.handsup.squick.Entity.Group;
+import com.handsup.squick.Entity.Member;
 import com.handsup.squick.Dto.GroupDto.GroupCreateDto;
 import com.handsup.squick.Dto.GroupDto.GroupDeleteDto;
-import com.handsup.squick.Dto.GroupDto.GroupModifyDto;
-import com.handsup.squick.Dto.GroupDto.GroupReadDto;
+import com.handsup.squick.Dto.GroupDto.GroupUpdateDto;
+import com.handsup.squick.Mapper.GroupMapper;
+import com.handsup.squick.Mapper.MemberMapper;
+import com.handsup.squick.Repository.AttendanceJpaRepository;
 import com.handsup.squick.Repository.GroupJpaRepository;
-import com.handsup.squick.Repository.UserJpaRepository;
+import com.handsup.squick.Repository.MemberGroupAttendanceJpaRepository;
+import com.handsup.squick.Repository.MemberJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class GroupService {
+public class GroupService{
     private final GroupJpaRepository groupJpaRepository;
-    private final UserJpaRepository userJpaRepository;
+    private final MemberJpaRepository memberJpaRepository;
+    private final AttendanceJpaRepository attendanceJpaRepository;
+    private final MemberGroupAttendanceJpaRepository memberGroupAttendanceJpaRepository;
+    private final GroupMapper groupMapper;
+    private final MemberMapper memberMapper;
 
-    public void groupCreate(GroupCreateDto dto){
-        GroupDao dao = GroupDao.builder()
-                .groupName(dto.getGroupName())
-                        .groupExplain(dto.getGroupExplain())
-                                .hostId(dto.getHostId())
-                                        .limitPerson(dto.getLimitPerson())
-                                                .startGroupDate(LocalDate.now())
-                                                        .build();
-        groupJpaRepository.save(dao);
+    public String getFileUrl(MultipartFile file) throws IOException{
+        String contextType = file.getContentType();
+        byte[] bytes = file.getBytes();
+
+        return "data:" + contextType + ":base64," + Base64.getEncoder().encodeToString(bytes);
     }
 
-    public boolean groupDelete(GroupDeleteDto dto){
-        boolean isHost = isHost(dto.getGroupName(), dto.getHostId());
+    public List groupRead(){
+        List<Group> groups = groupJpaRepository.findGroup();
 
-        if(isHost){
-
-            GroupDao dao = groupJpaRepository.findGroupDaoByGroupName(dto.getGroupName()).remove(0);
-            groupJpaRepository.deleteById(dao.getPk());
-            return true;
-        }
-
-        return false;
+        return groups;
     }
 
-    public boolean groupModify(GroupModifyDto dto){
-        if(isParentGroup(dto.getCurGroupName())){
-                GroupDao dao = groupJpaRepository.findGroupDaoByGroupName(dto.getCurGroupName()).remove(0);
+    public void groupCreate(GroupCreateDto dto, MultipartFile file) throws IOException{
+        String imageUrl = getFileUrl(file);
 
-                dao.setGroupName(dto.getNewGroupName());
-                dao.setGroupExplain(dto.getGroupExplain());
-                dao.setLimitPerson(dto.getLimitPerson());
+        Group groupDao = Group.builder()
+                        .name(dto.getName())
+                        .description(dto.getDescription())
+                        .img(imageUrl)
+                        .build();
 
-                groupJpaRepository.save(dao);
-                return true;
-        }
-        return false;
+        groupJpaRepository.save(groupDao);
     }
 
-    public GroupDao groupRead(String groupName){
-        GroupDao dao = groupJpaRepository.findGroupDaoByGroupName(groupName).remove(0);
+    public void groupUpdate(GroupCreateDto dto, MultipartFile file, long groupId) throws IOException{
+        String imageUrl = getFileUrl(file);
 
-        return dao;
+        Group group = groupJpaRepository.findByGroupId(groupId);
+        group.setName(dto.getName());
+        group.setDescription(dto.getDescription());
+        group.setImg(imageUrl);
+
+        groupJpaRepository.save(group);
     }
 
-    public GroupDao getGroupHostId(String groupName){
-        GroupDao list = groupJpaRepository.findDistinctByGroupName(groupName).remove(0);
-
-        return list;
+    public void expelMember(long memberId){
+        memberJpaRepository.deleteById(memberId);
     }
 
-    public boolean isHost(String groupName, String hostId){
-        String userId = groupJpaRepository.findGroupDaoByGroupName(groupName).remove(0).getHostId();
 
-        if(userId.equals(hostId)) return true;
+    public List getMember(long groupId){
+        List<Member> members = memberJpaRepository.findMemberDaoByGroupId(groupId);
 
-        return false;
+        return members;
     }
 
-    public boolean isParentGroup(String groupName){
-        if(groupJpaRepository.findGroupDaoByGroupName(groupName) == null) return false;
-        return true;
-    }
 
-    public List<String> getUsers(GroupReadDto dto){
-        List<UserDao> userDaos = userJpaRepository.findByGroupName(dto.getGroupName());
 
-        List<String> list = new ArrayList<>();
-        for(int i = 0; i < userDaos.size(); i++)
-            list.add(userDaos.get(i).getUserId());
 
-        return list;
-    }
+
+
+
+
+
+
 }

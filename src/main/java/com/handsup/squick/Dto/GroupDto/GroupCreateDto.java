@@ -10,11 +10,6 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class GroupCreateDto {
-    String groupName;
-    String hostId;
-    String groupExplain;
-    int limitPerson;
-
-    LocalDate startGroupDate;
-
+    String name;
+    String description;
 }

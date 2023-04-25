@@ -10,5 +10,5 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class GroupReadDto {
-    String groupName;
+    String name;
 }

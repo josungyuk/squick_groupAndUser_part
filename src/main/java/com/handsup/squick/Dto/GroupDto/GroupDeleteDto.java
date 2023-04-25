@@ -8,6 +8,5 @@ import lombok.*;
 @Getter
 @Setter
 public class GroupDeleteDto {
-    String hostId;
-    String groupName;
+    String name;
 }

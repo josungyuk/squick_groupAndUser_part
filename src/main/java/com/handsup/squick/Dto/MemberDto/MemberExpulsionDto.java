@@ -1,4 +1,4 @@
-package com.handsup.squick.Dto.UserDto;
+package com.handsup.squick.Dto.MemberDto;
 
 import lombok.*;
 
@@ -7,9 +7,8 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Setter
-public class UserReadDto {
+public class MemberExpulsionDto {
     String hostId;
+    String userId;
     String groupName;
-    int Attendence;
-    int lateness;
 }

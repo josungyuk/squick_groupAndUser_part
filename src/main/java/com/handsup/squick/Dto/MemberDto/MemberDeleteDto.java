@@ -1,4 +1,4 @@
-package com.handsup.squick.Dto.UserDto;
+package com.handsup.squick.Dto.MemberDto;
 
 import lombok.*;
 
@@ -7,7 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Setter
-public class UserDeleteDto {
+public class MemberDeleteDto {
     String userId;
     String checkUserId;
     String groupName;

@@ -7,9 +7,8 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class GroupModifyDto {
-    String curGroupName;
-    String newGroupName;
-    String groupExplain;
-    int limitPerson;
+public class GroupUpdateDto {
+    String curName;
+    String newName;
+    String discription;
 }
