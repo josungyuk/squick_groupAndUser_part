@@ -25,7 +25,7 @@ public class MemberService {
 
     // 그룹 내 한 회원의 출결상태별 수
     public AttendCountDto getMemberDetail(long groupId, long memberId){
-        List<Attendance> attendList = memberJpaRepository.findMemberDetail(groupId, memberId);
+        List<Attendance> attendList = attendanceJpaRepository.findMemberDetail(groupId, memberId);
 
         int attend = 0;
         int absent = 0;
@@ -34,12 +34,17 @@ public class MemberService {
         while(!attendList.isEmpty()){
             Attendance attendStatus = attendList.remove(0);
 
-            if(attendStatus.getStatus().equals("attend"))
-                attend++;
-            else if(attendStatus.getStatus().equals("absent"))
-                absent++;
-            else if(attendStatus.getStatus().equals("late"))
-                late++;
+            switch(attendStatus.getAttendanceStatus()){
+                case STATUS_ATTEND:
+                    attend++;
+                    break;
+                case STATUS_ABSENT:
+                    absent++;
+                    break;
+                case STATUS_LATE:
+                    late++;
+                    break;
+            }
         }
 
         return AttendCountDto.builder()
@@ -50,7 +55,7 @@ public class MemberService {
     }
 
     public List getMemberAttendance(long groupId, long memberId, LocalDate date){
-        List<Attendance> attendances = memberJpaRepository.findMemberAttendance(groupId, memberId, date);
+        List<Attendance> attendances = attendanceJpaRepository.findMemberAttendance(groupId, memberId, date);
 
         return attendances;
     }
@@ -58,7 +63,24 @@ public class MemberService {
     public void updateMemberAttendance(long attnedanceId, String status){
         Attendance attendance = attendanceJpaRepository.findByAttandanceId(attnedanceId);
 
-        attendance.setStatus(status);
+        switch(status){
+            case "ATTEND":
+                attendance.setAttendanceStatus(Attendance.AttendanceStatus.STATUS_ATTEND);
+                break;
+            case "ABSENT":
+                attendance.setAttendanceStatus(Attendance.AttendanceStatus.STATUS_ABSENT);
+                break;
+            case "LATE":
+                attendance.setAttendanceStatus(Attendance.AttendanceStatus.STATUS_LATE);
+                break;
+        }
+
         attendanceJpaRepository.save(attendance);
+    }
+
+    public void setPin(long memberId){
+        Member member = memberJpaRepository.findMemberByMemberId(memberId);
+
+        member.setPin(!member.isPin());
     }
 }

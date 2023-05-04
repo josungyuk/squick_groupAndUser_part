@@ -11,18 +11,13 @@ import java.util.List;
 
 @Repository
 public interface MemberJpaRepository extends JpaRepository<Member, Long> {
-    @Query(value = "select a from Member m join MemberGroupAttendance mga on mga.member.memberId = m.memberId " +
-            "join Attendance a on mga.attendance.attandanceId = a.attandanceId " +
-            "where mga.group.groupId = :groupId")
-    List<Attendance> findMemberDetail(long groupId, long memberId);
 
-    @Query(value = "select a from Member m " +
-            "join MemberGroupAttendance mga on mga.member.memberId = m.memberId " +
-            "join Attendance a on a.attandanceId = mga.attendance.attandanceId " +
-            "where a.time = :date and mga.group.groupId = :groupId and m.memberId = :memberId")
-    List<Attendance> findMemberAttendance(long groupId, long memberId, LocalDate date);
+    Member findMemberByMemberName(String memberName);
+    @Query(value = "select m from Member m " +
+            "join MemberGroup mg on m.memberId = mg.member.memberId " +
+            "where mg.group.groupId = :groupId")
+    List<Member> findMemberByGroupId(long groupId);
 
-    List<Member> deleteByUserIdAndGroupName(String userName, String groupName);
+    Member findMemberByMemberId(long memberId);
 
-    List<Member> findMemberDaoByGroupId(long groupId);
 }

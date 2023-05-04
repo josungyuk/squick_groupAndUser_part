@@ -1,16 +1,14 @@
 package com.handsup.squick.Service;
 
-import com.handsup.squick.Entity.Attendance;
+import com.handsup.squick.Dto.GroupDto.Attend.AttendStatus;
+import com.handsup.squick.Dto.MemberDto.Participatation.ParticipationDto;
 import com.handsup.squick.Entity.Group;
 import com.handsup.squick.Entity.Member;
 import com.handsup.squick.Dto.GroupDto.GroupCreateDto;
-import com.handsup.squick.Dto.GroupDto.GroupDeleteDto;
-import com.handsup.squick.Dto.GroupDto.GroupUpdateDto;
 import com.handsup.squick.Mapper.GroupMapper;
 import com.handsup.squick.Mapper.MemberMapper;
 import com.handsup.squick.Repository.AttendanceJpaRepository;
 import com.handsup.squick.Repository.GroupJpaRepository;
-import com.handsup.squick.Repository.MemberGroupAttendanceJpaRepository;
 import com.handsup.squick.Repository.MemberJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,11 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +24,6 @@ public class GroupService{
     private final GroupJpaRepository groupJpaRepository;
     private final MemberJpaRepository memberJpaRepository;
     private final AttendanceJpaRepository attendanceJpaRepository;
-    private final MemberGroupAttendanceJpaRepository memberGroupAttendanceJpaRepository;
     private final GroupMapper groupMapper;
     private final MemberMapper memberMapper;
 
@@ -47,28 +40,90 @@ public class GroupService{
         return groups;
     }
 
+    public String getCode(){
+        int zero = 80;
+        int nine = 89;
+        Random random = new Random();
+
+        String code = random.ints(zero, nine + 1)
+                .limit(6)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
+
+        return code;
+    }
+
+    public boolean isVaildCode(long groupId, String code){
+        Group group = groupJpaRepository.findByGroupId(groupId);
+
+        if(group.getInvitationCode().equals(code))
+            return true;
+
+        return false;
+    }
+
+    public List getWaitMember(long groupId){
+        List<Member> members = memberJpaRepository.findMemberByGroupId(groupId);
+
+        List<Member> acceptMembers = new ArrayList<>();
+
+        for(Member member : members){
+            if(member.getInvitationStatus() == Member.InvitationStatus.INVITATION_ACCEPT)
+                acceptMembers.add(member);
+        }
+
+        return acceptMembers;
+    }
+
     public void groupCreate(GroupCreateDto dto, MultipartFile file) throws IOException{
         String imageUrl = getFileUrl(file);
 
-        Group groupDao = Group.builder()
-                        .name(dto.getName())
-                        .description(dto.getDescription())
-                        .img(imageUrl)
-                        .build();
+        Group group = Group.builder()
+                .groupName(dto.getGroupName())
+                .description(dto.getDescription())
+                .img(imageUrl)
+                .invitationCode(getCode())
+                .build();
 
-        groupJpaRepository.save(groupDao);
+        Member member = memberJpaRepository.findMemberByMemberName(dto.getMemberName());
+
+        Member masterMember = Member.builder()
+                .memberName(member.getMemberName())
+                .isPin(member.isPin())
+                .invitationStatus(Member.InvitationStatus.INVITATION_ACCEPT)
+                .email(member.getEmail())
+                .img(member.getImg())
+                .build();
+
+        memberJpaRepository.save(masterMember);
+        groupJpaRepository.save(group);
     }
 
     public void groupUpdate(GroupCreateDto dto, MultipartFile file, long groupId) throws IOException{
         String imageUrl = getFileUrl(file);
 
         Group group = groupJpaRepository.findByGroupId(groupId);
-        group.setName(dto.getName());
+        group.setGroupName(dto.getGroupName());
         group.setDescription(dto.getDescription());
         group.setImg(imageUrl);
 
         groupJpaRepository.save(group);
     }
+
+    public HashMap getAttendanceStatus(LocalDate date, long groupId){
+        List<Long> membersId = groupJpaRepository.findMemberByGroupId(groupId);
+
+        HashMap<Integer, List<AttendStatus>> map = new HashMap<>();
+        int idx = 0;
+        for(long memberId : membersId){
+            List<AttendStatus> attendStatuses = attendanceJpaRepository.findGroupCurAttendStatus(date, groupId, memberId);
+
+            map.put(idx++, attendStatuses);
+        }
+
+        return map;
+    }
+
 
     public void expelMember(long memberId){
         memberJpaRepository.deleteById(memberId);
@@ -76,12 +131,15 @@ public class GroupService{
 
 
     public List getMember(long groupId){
-        List<Member> members = memberJpaRepository.findMemberDaoByGroupId(groupId);
+        List<Member> members = memberJpaRepository.findMemberByGroupId(groupId);
 
         return members;
     }
 
-
+    public void participate(long memberId){
+        Member member = memberJpaRepository.findMemberByMemberId(memberId);
+        member.setInvitationStatus(Member.InvitationStatus.INVITATION_ACCEPT);
+    }
 
 
 

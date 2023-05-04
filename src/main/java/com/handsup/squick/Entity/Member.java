@@ -1,5 +1,7 @@
 package com.handsup.squick.Entity;
 
+import com.handsup.squick.Entity.JoinEntity.MemberAttendance;
+import com.handsup.squick.Entity.JoinEntity.MemberGroup;
 import lombok.*;
 
 import javax.persistence.*;
@@ -12,20 +14,43 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-@Table(name = "UserTable")
+@Table(name = "Member")
 public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    long memberPk;
     @Column(name = "memberId")
-    String memberId;
+    long memberId;
+    @Column(name = "memberName")
+    String memberName;
     @Column(name = "isPin")
     boolean isPin;
+
+    @Enumerated(value = EnumType.STRING)
+    @Column(name = "invitationStatus")
+    InvitationStatus invitationStatus = InvitationStatus.INVITATION_WAIT;
     @Column(name = "email")
     int email;
-    @Column(name = "img")
+    @Column(name = "img", length = 65546)
     String img;
 
-    @OneToMany(mappedBy = "member")
-    List<MemberGroupAttendance> memberGroupAttendances = new ArrayList<>();
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    List<MemberAttendance> memberAttendances = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    List<MemberGroup> memberGroups = new ArrayList<>();
+
+    public enum InvitationStatus{
+        INVITATION_ACCEPT("허가"),
+
+        INVITATION_WAIT("대기중"),
+        INVITATION_DENY("거부");
+
+        @Getter
+        @Setter
+        private String status;
+
+        InvitationStatus(String status) {
+            this.status = status;
+        }
+    }
 }

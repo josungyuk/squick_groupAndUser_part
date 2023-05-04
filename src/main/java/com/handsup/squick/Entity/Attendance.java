@@ -1,7 +1,9 @@
 package com.handsup.squick.Entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.handsup.squick.Entity.JoinEntity.GroupAttendence;
+import com.handsup.squick.Entity.JoinEntity.MemberAttendance;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -14,7 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-@Table(name = "AttendanceTable")
+@Table(name = "Attendance")
 public class Attendance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,11 +24,34 @@ public class Attendance {
     @Column(name = "day")
     int day;
     @Column(name = "time")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     LocalDate time;
-    @Column(name = "status")
-    String status;
 
-    @OneToMany(mappedBy = "attendance")
-    List<MemberGroupAttendance> memberGroupAttendances = new ArrayList<>();
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    AttendanceStatus attendanceStatus;
+
+    @Column(name = "groupName")
+    String groupName;
+
+    @Column(name = "memberName")
+    String memberName;
+
+    @OneToMany(mappedBy = "attendance", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    List<MemberAttendance> memberAttendances = new ArrayList<>();
+
+    @OneToMany(mappedBy = "attendance", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    List<GroupAttendence> groupAttendences = new ArrayList<>();
+
+    public enum AttendanceStatus{
+        STATUS_ATTEND("참석"),
+        STATUS_ABSENT("결석"),
+        STATUS_LATE("지각");
+
+        private String status;
+
+        AttendanceStatus(String status){
+            this.status = status;
+        }
+    }
 }
