@@ -7,8 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Setter
-public class MemberExpulsionDto {
-    String hostId;
-    String userId;
+public class MemberExpelDto {
+    String memberName;
     String groupName;
 }

@@ -8,6 +8,6 @@ import lombok.*;
 @Getter
 @Setter
 public class MemberAddDto {
-    String userId;
-    String groupName;
+    String memberName;
+    String code;
 }

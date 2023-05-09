@@ -3,19 +3,17 @@ package com.handsup.squick.Controller;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.handsup.squick.Dto.GroupDto.Attend.AttendCountDto;
 import com.handsup.squick.Dto.GroupDto.Attend.AttendStatus;
+import com.handsup.squick.Dto.MemberDto.MemberAddDto;
+import com.handsup.squick.Dto.MemberDto.MemberExpelDto;
 import com.handsup.squick.Dto.MemberDto.Participatation.ParticipationDto;
 import com.handsup.squick.Entity.Attendance;
 import com.handsup.squick.Entity.Group;
 import com.handsup.squick.Dto.GroupDto.GroupCreateDto;
-import com.handsup.squick.Dto.GroupDto.GroupDeleteDto;
-import com.handsup.squick.Dto.GroupDto.GroupUpdateDto;
-import com.handsup.squick.Dto.GroupDto.GroupReadDto;
 import com.handsup.squick.Entity.Member;
 import com.handsup.squick.Service.GroupService;
 import com.handsup.squick.Service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,7 +23,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -66,7 +63,7 @@ public class GroupController {
         if(!isAccept)
             return new ResponseEntity<>(false, HttpStatus.OK);
 
-        groupService.participate(dto.getMemberID());
+        groupService.participate(dto);
 
         return new ResponseEntity<>(true, HttpStatus.OK);
     }
@@ -84,8 +81,8 @@ public class GroupController {
     @PostMapping("/members/{groupId}")          //완
     public ResponseEntity joinGroup(@RequestHeader("AccessToken") String accessToken,
                                     @RequestParam("groupId") long groupId,
-                                    @RequestBody String code){
-        boolean response = groupService.isVaildCode(groupId, code);
+                                    @RequestBody MemberAddDto dto){
+        boolean response = groupService.isVaildCode(groupId, dto);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -114,10 +111,10 @@ public class GroupController {
         return ResponseEntity.ok("Modify Success");
     }
 
-    @DeleteMapping("/members/{memberId}")           //완
+    @DeleteMapping("/members/expel")           //완
     public ResponseEntity expelMember(@RequestHeader("AccessToken") String accessToken,
-                                 @PathVariable long memberId){
-        groupService.expelMember(memberId);
+                                      @RequestBody MemberExpelDto dto){
+        groupService.expelMember(dto);
 
         return new ResponseEntity<>(true, HttpStatus.OK);
     }

@@ -2,11 +2,7 @@ package com.handsup.squick.Service;
 
 import com.handsup.squick.Dto.GroupDto.Attend.AttendCountDto;
 import com.handsup.squick.Entity.Attendance;
-import com.handsup.squick.Entity.Group;
 import com.handsup.squick.Entity.Member;
-import com.handsup.squick.Dto.MemberDto.MemberAddDto;
-import com.handsup.squick.Dto.MemberDto.MemberDeleteDto;
-import com.handsup.squick.Dto.MemberDto.MemberExpulsionDto;
 import com.handsup.squick.Repository.AttendanceJpaRepository;
 import com.handsup.squick.Repository.GroupJpaRepository;
 import com.handsup.squick.Repository.MemberJpaRepository;

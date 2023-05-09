@@ -29,7 +29,7 @@ public class Member {
     @Column(name = "invitationStatus")
     InvitationStatus invitationStatus = InvitationStatus.INVITATION_WAIT;
     @Column(name = "email")
-    int email;
+    String email;
     @Column(name = "img", length = 65546)
     String img;
 
@@ -41,7 +41,6 @@ public class Member {
 
     public enum InvitationStatus{
         INVITATION_ACCEPT("허가"),
-
         INVITATION_WAIT("대기중"),
         INVITATION_DENY("거부");
 

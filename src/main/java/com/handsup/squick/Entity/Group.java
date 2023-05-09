@@ -18,21 +18,23 @@ import java.util.List;
 public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "groupId")
     long groupId;
     @Column(name = "groupName")
     String groupName;
-    @Column(name = "invitationCode")
-    String invitationCode;
+    @Column(name = "MasterName")
+    String masterName;
+    @Column(name = "img", length = 65536)
+    String img;
     @Column(name = "description")
     String description;
-    @Column(name = "isMaster")
-    boolean isMaster;
+    @Column(name = "invitationCode")
+    String invitationCode;
     @Column(name = "isPin")
     boolean isPin;
     @Column(name = "isAlarm")
     boolean isAlarm;
-    @Column(name = "img", length = 65536)
-    String img;
+
 
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     List<GroupAttendence> groupAttendances = new ArrayList<>();

@@ -1,0 +1,223 @@
+package com.handsup.squick.ServiceTest;
+
+import com.google.gson.Gson;
+import com.handsup.squick.Dto.GroupDto.Attend.AttendStatus;
+import com.handsup.squick.Dto.GroupDto.GroupCreateDto;
+import com.handsup.squick.Entity.Attendance;
+import com.handsup.squick.Entity.Group;
+import com.handsup.squick.Entity.JoinEntity.MemberGroup;
+import com.handsup.squick.Entity.Member;
+import com.handsup.squick.Repository.AttendanceJpaRepository;
+import com.handsup.squick.Repository.GroupJpaRepository;
+import com.handsup.squick.Repository.JoinRepo.MemberGroupJpaRepository;
+import com.handsup.squick.Repository.MemberJpaRepository;
+import com.handsup.squick.Service.GroupService;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.*;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+
+@Transactional
+@ExtendWith(MockitoExtension.class)
+public class GroupServiceTest {
+    @InjectMocks
+    private GroupService groupService;
+
+    @Mock
+    private GroupJpaRepository groupJpaRepository;
+
+    @Mock
+    private MemberJpaRepository memberJpaRepository;
+
+    @Mock
+    private MemberGroupJpaRepository memberGroupJpaRepository;
+
+    @Mock
+    private AttendanceJpaRepository attendanceJpaRepository;
+
+    @Test
+    public void groupCreateTest(){
+        //given
+        Group group = Group.builder()
+                .groupName("TestGroup")
+                .description("blabla")
+                .masterName("TestMember")
+                .img("img")
+                .invitationCode("aaaaaa")
+                .build();
+
+        Member member = Member.builder()
+                .memberName("TestMember")
+                .isPin(true)
+                .invitationStatus(Member.InvitationStatus.INVITATION_ACCEPT)
+                .email("test@test.com")
+                .img("TestImg")
+                .build();
+
+        MemberGroup memberGroup = MemberGroup.builder()
+                .member(member)
+                .group(group)
+                .build();
+
+        given(memberGroupJpaRepository.save(memberGroup)).willReturn(memberGroup);
+        given(memberJpaRepository.save(member)).willReturn(member);
+        given(groupJpaRepository.save(group)).willReturn(group);
+
+        //when
+        Member testMember = memberJpaRepository.save(member);
+        Group testGroup = groupJpaRepository.save(group);
+        MemberGroup testMemberGroup = memberGroupJpaRepository.save(memberGroup);
+
+        //then
+        assertThat(testMember, is(equalTo(member)));
+        assertThat(testGroup, is(equalTo(group)));
+        assertThat(testMemberGroup, is(equalTo(testMemberGroup)));
+    }
+
+    @Test
+    public void groupUpdateTest(){
+        //given
+        Group group = Group.builder()
+                .groupName("TestGroup")
+                .description("blabla")
+                .masterName("TestMember")
+                .img("img")
+                .invitationCode("aaaaaa")
+                .build();
+
+        groupJpaRepository.save(group);
+
+        group.setGroupName("TestUpdateGroup");
+
+        given(groupJpaRepository.save(group)).willReturn(group);
+
+        //when
+        Group testGroup = groupJpaRepository.save(group);
+
+        //then
+        assertThat(testGroup, is(equalTo(group)));
+    }
+
+    @Test
+    public void getAttendanceStatusTest(){
+        //given
+        LocalDate date = LocalDate.of(2023, 5, 5);
+
+        Group group = Group.builder()
+                .groupId(1L)
+                .groupName("TestGroup")
+                .description("blabla")
+                .masterName("TestMember")
+                .img("img")
+                .invitationCode("aaaaaa")
+                .build();
+
+        Member member1 = Member.builder()
+                .memberId(1L)
+                .memberName("Member1")
+                .isPin(true)
+                .invitationStatus(Member.InvitationStatus.INVITATION_ACCEPT)
+                .email("test@test.com")
+                .img("TestImg")
+                .build();
+
+        Member member2 = Member.builder()
+                .memberId(2L)
+                .memberName("Member2")
+                .isPin(true)
+                .invitationStatus(Member.InvitationStatus.INVITATION_WAIT)
+                .email("test@test.com")
+                .img("TestImg")
+                .build();
+
+        Attendance attendance1 = Attendance.builder()
+                .day(0)
+                .date(date)
+                .attendanceStatus(Attendance.AttendanceStatus.STATUS_ATTEND)
+                .groupName(group.getGroupName())
+                .memberName(member1.getMemberName())
+                .build();
+
+        Attendance attendance2 = Attendance.builder()
+                .day(0)
+                .date(date)
+                .attendanceStatus(Attendance.AttendanceStatus.STATUS_ABSENT)
+                .groupName(group.getGroupName())
+                .memberName(member2.getMemberName())
+                .build();
+
+        AttendStatus attend1 = AttendStatus.builder()
+                .memberName(member1.getMemberName())
+                .date(date)
+                .state("ATTEND")
+                .build();
+
+        AttendStatus attend2 = AttendStatus.builder()
+                .memberName(member2.getMemberName())
+                .date(date)
+                .state("ABSENT")
+                .build();
+
+        //groupJpaRepository.findMemberIdByGroupId의 반환된 결과
+        List<Long> membersId = new ArrayList<>();
+        membersId.add(member1.getMemberId());
+        membersId.add(member2.getMemberId());
+
+        //attendanceJpaRepository.findGroupCurAttendStatus의 member1 Id 를 검색하여 반환된 결과
+        List<Attendance> member1Attend = new ArrayList<>();
+        member1Attend.add(attendance1);
+
+        //attendanceJpaRepository.findGroupCurAttendStatus의 member2 Id 를 검색하여 반환된 결과
+        List<Attendance> member2Attend = new ArrayList<>();
+        member2Attend.add(attendance2);
+
+        //groupService.getAttendanceStatus의 반환된 결과
+        List<AttendStatus> list1 = new ArrayList<>();
+        list1.add(attend1);
+
+        List<AttendStatus> list2 = new ArrayList<>();
+        list2.add(attend2);
+
+        HashMap<Integer, List<AttendStatus>> map = new HashMap<>();
+
+        map.put(1, list1);
+        map.put(2, list2);
+
+        given(groupJpaRepository.findMemberIdByGroupId(group.getGroupId())).willReturn(membersId);
+        given(attendanceJpaRepository.findGroupCurAttendStatus(date, group.getGroupId(), membersId.get(0))).willReturn(member1Attend);
+        given(attendanceJpaRepository.findGroupCurAttendStatus(date, group.getGroupId(), membersId.get(1))).willReturn(member2Attend);
+
+        //when
+        HashMap<Integer, List<AttendStatus>> testMap = groupService.getAttendanceStatus(date, group.getGroupId());
+
+        //then
+        assertThat(testMap.size(), is(map.size()));
+        assertThat(testMap.get(0).size(), is(equalTo(map.get(1).size())));
+
+        assertThat(testMap.get(0).get(0).getMemberName(), is(equalTo(map.get(1).get(0).getMemberName())));
+        assertThat(testMap.get(0).get(0).getDate(), is(equalTo(map.get(1).get(0).getDate())));
+        assertThat(testMap.get(0).get(0).getState(), is(equalTo(map.get(1).get(0).getState())));
+
+        assertThat(testMap.get(1).get(0).getMemberName(), is(equalTo(map.get(2).get(0).getMemberName())));
+        assertThat(testMap.get(1).get(0).getDate(), is(equalTo(map.get(2).get(0).getDate())));
+        assertThat(testMap.get(1).get(0).getState(), is(equalTo(map.get(2).get(0).getState())));
+    }
+}

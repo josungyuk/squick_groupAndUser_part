@@ -9,6 +9,6 @@ import lombok.*;
 @AllArgsConstructor
 public class ParticipationDto {
     long groupId;
-    long userID;
+    long memberId;
     boolean isAccept;
 }

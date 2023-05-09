@@ -22,13 +22,14 @@ public interface AttendanceJpaRepository extends JpaRepository<Attendance, Long>
     @Query(value = "select m from Member m " +
             "join MemberGroup mg on m.memberId = mg.member.memberId " +
             "join GroupAttendence ga on mg.group.groupId = ga.group.groupId " +
-            "where mg.group.groupId = :groupId and m.memberId = :memberId and ga.attendance.time = :date")
+            "where mg.group.groupId = :groupId and m.memberId = :memberId and ga.attendance.date = :date")
     List<Attendance> findMemberAttendance(long groupId, long memberId, LocalDate date);
 
-    @Query(value = "select mg.member.memberName, a.time, a.attendanceStatus from Attendance a " +
+    //테스트 완
+    @Query(value = "select a from Attendance a " +
             "join GroupAttendence ga on a.attandanceId = ga.attendance.attandanceId " +
             "join MemberGroup mg on ga.group.groupId = mg.member.memberId " +
-            "where a.time = :date and ga.group.groupId = :groupId and mg.member.memberId = :memberId")
-    List<AttendStatus> findGroupCurAttendStatus(LocalDate date, long groupId, long memberId);
+            "where a.date = :date and ga.group.groupId = :groupId and mg.member.memberId = :memberId")
+    List<Attendance> findGroupCurAttendStatus(LocalDate date, long groupId, long memberId);
 
 }

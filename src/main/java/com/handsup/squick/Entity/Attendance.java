@@ -20,12 +20,13 @@ import java.util.List;
 public class Attendance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "attendanceId")
     long attandanceId;
     @Column(name = "day")
     int day;
     @Column(name = "time")
     @JsonFormat(pattern = "yyyy-MM-dd")
-    LocalDate time;
+    LocalDate date;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
