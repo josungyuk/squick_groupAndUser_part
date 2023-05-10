@@ -78,19 +78,6 @@ public class GroupService{
         return true;
     }
 
-    public List getWaitMember(long groupId){
-        List<Member> members = memberJpaRepository.findMemberByGroupId(groupId);
-
-        List<Member> acceptMembers = new ArrayList<>();
-
-        for(Member member : members){
-            if(member.getInvitationStatus() == Member.InvitationStatus.INVITATION_ACCEPT)
-                acceptMembers.add(member);
-        }
-
-        return acceptMembers;
-    }
-
 
     public void groupCreate(GroupCreateDto dto, MultipartFile file) throws IOException{
         String imageUrl = getFileUrl(file);
@@ -169,39 +156,6 @@ public class GroupService{
         }
 
         return map;
-    }
-
-
-    public void expelMember(MemberExpelDto dto){
-        Member member = memberJpaRepository.findMemberByMemberName(dto.getMemberName());
-
-        long memberId = member.getMemberId();
-
-        MemberGroup memberGroup = memberGroupJpaRepository.findByMemberId(memberId);
-
-        memberGroupJpaRepository.delete(memberGroup);
-    }
-
-
-    public List getMember(long groupId){
-        List<Member> members = memberJpaRepository.findMemberByGroupId(groupId);
-
-        return members;
-    }
-
-    public void participate(ParticipationDto dto){
-        Member member = memberJpaRepository.findMemberByMemberId(dto.getMemberId());
-        member.setInvitationStatus(Member.InvitationStatus.INVITATION_ACCEPT);
-
-        Group group = groupJpaRepository.findByGroupId(dto.getGroupId());
-
-        MemberGroup memberGroup = MemberGroup.builder()
-                .member(member)
-                .group(group)
-                .build();
-
-        memberGroupJpaRepository.save(memberGroup);
-        memberJpaRepository.save(member);
     }
 
 

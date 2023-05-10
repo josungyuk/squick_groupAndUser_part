@@ -41,7 +41,7 @@ public class GroupController {
     public ResponseEntity getMember(@RequestHeader("AccessToken") String accessToken,
                                     @RequestParam("groupId") long groupId){
 
-        List<Group> response = groupService.getMember(groupId);
+        List<Group> response = memberService.getMember(groupId);
 
         return new ResponseEntity(response, HttpStatus.OK);
     }
@@ -50,7 +50,7 @@ public class GroupController {
     @GetMapping("/participate/{groupId}")           //완
     public ResponseEntity getParticipate(@RequestHeader("AccessToken") String accessToken,
                                          @RequestParam("groupId") long groupId){
-        List<Member> response = groupService.getWaitMember(groupId);
+        List<Member> response = memberService.getWaitMember(groupId);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -63,7 +63,7 @@ public class GroupController {
         if(!isAccept)
             return new ResponseEntity<>(false, HttpStatus.OK);
 
-        groupService.participate(dto);
+        memberService.participate(dto);
 
         return new ResponseEntity<>(true, HttpStatus.OK);
     }
@@ -114,7 +114,7 @@ public class GroupController {
     @DeleteMapping("/members/expel")           //완
     public ResponseEntity expelMember(@RequestHeader("AccessToken") String accessToken,
                                       @RequestBody MemberExpelDto dto){
-        groupService.expelMember(dto);
+        memberService.expelMember(dto);
 
         return new ResponseEntity<>(true, HttpStatus.OK);
     }

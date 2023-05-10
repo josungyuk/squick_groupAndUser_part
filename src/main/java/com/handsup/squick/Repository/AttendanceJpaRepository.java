@@ -11,19 +11,22 @@ import java.util.List;
 
 @Repository
 public interface AttendanceJpaRepository extends JpaRepository<Attendance, Long> {
+    //테스트 완
     Attendance findByAttandanceId(long attendanceId);
 
+    //테스트 완
     @Query(value = "select a from Attendance a " +
             "join GroupAttendence ga on ga.attendance.attandanceId = a.attandanceId " +
             "join MemberGroup mg on mg.group.groupId = ga.group.groupId " +
             "where mg.group.groupId = :groupId and mg.member.memberId = :memberId")
-    List<Attendance> findMemberDetail(long groupId, long memberId);
+    List<Attendance> findAllAttendanceByGroupIdAndMemberId(long groupId, long memberId);
 
-    @Query(value = "select m from Member m " +
-            "join MemberGroup mg on m.memberId = mg.member.memberId " +
-            "join GroupAttendence ga on mg.group.groupId = ga.group.groupId " +
-            "where mg.group.groupId = :groupId and m.memberId = :memberId and ga.attendance.date = :date")
-    List<Attendance> findMemberAttendance(long groupId, long memberId, LocalDate date);
+    //테스트 완
+    @Query(value = "select a from Attendance a " +
+            "join GroupAttendence ga on a.attandanceId = ga.attendance.attandanceId " +
+            "join MemberGroup mg on mg.group.groupId = ga.group.groupId " +
+            "where mg.group.groupId = :groupId and mg.member.memberId = :memberId and a.date = :date")
+    List<Attendance> findDateAttendanceByGroupIdAndMemberIdAndDate(long groupId, long memberId, LocalDate date);
 
     //테스트 완
     @Query(value = "select a from Attendance a " +
