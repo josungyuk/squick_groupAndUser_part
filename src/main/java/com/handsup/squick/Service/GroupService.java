@@ -40,15 +40,17 @@ public class GroupService{
         return "data:" + contextType + ":base64," + Base64.getEncoder().encodeToString(bytes);
     }
 
+    //테스트 완
     public List groupRead(){
         List<Group> groups = groupJpaRepository.findGroup();
 
         return groups;
     }
 
+    //테스트 완
     public String getCode(){
-        int zero = 80;
-        int nine = 89;
+        int zero = 48;
+        int nine = 57;
         Random random = new Random();
 
         String code = random.ints(zero, nine + 1)
@@ -59,6 +61,7 @@ public class GroupService{
         return code;
     }
 
+    //테스트 완
     public boolean isVaildCode(long groupId, MemberAddDto dto){
         Group group = groupJpaRepository.findByGroupId(groupId);
         String code = dto.getCode();
@@ -78,7 +81,7 @@ public class GroupService{
         return true;
     }
 
-
+    //테스트 완
     public void groupCreate(GroupCreateDto dto, MultipartFile file) throws IOException{
         String imageUrl = getFileUrl(file);
 

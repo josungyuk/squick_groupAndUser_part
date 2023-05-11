@@ -3,6 +3,7 @@ package com.handsup.squick.ServiceTest;
 import com.google.gson.Gson;
 import com.handsup.squick.Dto.GroupDto.Attend.AttendStatus;
 import com.handsup.squick.Dto.GroupDto.GroupCreateDto;
+import com.handsup.squick.Dto.MemberDto.MemberAddDto;
 import com.handsup.squick.Entity.Attendance;
 import com.handsup.squick.Entity.Group;
 import com.handsup.squick.Entity.JoinEntity.MemberGroup;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,6 +54,109 @@ public class GroupServiceTest {
 
     @Mock
     private AttendanceJpaRepository attendanceJpaRepository;
+
+
+    @Test
+    public void groupReadTest(){
+        String code = "000000";
+        long groupId1 = 1L;
+        long groupId2 = 2L;
+        String memberName = "Member";
+
+        Group group1= Group.builder()
+                .groupId(groupId1)
+                .groupName("group1")
+                .img("img")
+                .masterName(memberName)
+                .description("desc")
+                .isPin(true)
+                .isAlarm(true)
+                .invitationCode(code)
+                .build();
+
+        Group group2 = Group.builder()
+                .groupId(groupId2)
+                .groupName("group2")
+                .img("img")
+                .masterName(memberName)
+                .description("desc")
+                .isPin(true)
+                .isAlarm(true)
+                .invitationCode(code)
+                .build();
+
+        List<Group> groups = new ArrayList<>();
+        groups.add(group1);
+        groups.add(group2);
+
+        given(groupJpaRepository.findGroup()).willReturn(groups);
+
+        List<Group> testGroups = groupService.groupRead();
+        Group testGroup1 = testGroups.get(0);
+        Group testGroup2 = testGroups.get(1);
+
+        assertThat(group1.getGroupName(), is(equalTo(testGroup1.getGroupName())));
+        assertThat(group1.getGroupId(), is(equalTo(testGroup1.getGroupId())));
+        assertThat(group1.getImg(), is(equalTo(testGroup1.getImg())));
+
+        assertThat(group2.getGroupName(), is(equalTo(testGroup2.getGroupName())));
+        assertThat(group2.getGroupId(), is(equalTo(testGroup2.getGroupId())));
+        assertThat(group2.getImg(), is(equalTo(testGroup2.getImg())));
+
+    }
+    @Test
+    public void getCodeTest(){
+        String code = groupService.getCode();
+
+        System.out.println(code);
+    }
+    @Test
+    public void isVaildCodeTest(){
+        String code = "000000";
+        long groupId = 1L;
+        long memberId = 1L;
+        String memberName = "Member";
+
+        Group group = Group.builder()
+                .groupId(groupId)
+                .groupName("group")
+                .img("img")
+                .masterName(memberName)
+                .description("desc")
+                .isPin(true)
+                .isAlarm(true)
+                .invitationCode(code)
+                .build();
+
+        Member member = Member.builder()
+                .memberId(memberId)
+                .memberName(memberName)
+                .email("test@test.com")
+                .img("image")
+                .invitationStatus(Member.InvitationStatus.INVITATION_ACCEPT)
+                .build();
+
+        MemberGroup memberGroup = MemberGroup.builder()
+                .member(member)
+                .group(group)
+                .build();
+
+        MemberAddDto dto = MemberAddDto.builder()
+                .memberName(memberName)
+                .code(code)
+                .build();
+
+        given(groupJpaRepository.findByGroupId(groupId)).willReturn(group);
+        given(memberJpaRepository.findMemberByMemberNameAndGroupId(memberName, groupId)).willReturn(member);
+
+        Group testGroup = groupJpaRepository.save(group);
+        Member testMember = memberJpaRepository.save(member);
+        MemberGroup testMemberGroup = memberGroupJpaRepository.save(memberGroup);
+
+        boolean isVaild = groupService.isVaildCode(groupId, dto);
+
+        assertThat(true, is(equalTo(isVaild)));
+    }
 
     @Test
     public void groupCreateTest(){
