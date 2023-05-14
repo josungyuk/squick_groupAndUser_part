@@ -20,8 +20,13 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "memberId")
     long memberId;
+
     @Column(name = "memberName")
     String memberName;
+
+    @Column(name = "groupName")
+    String groupName;
+
     @Column(name = "isPin")
     boolean isPin;
 

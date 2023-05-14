@@ -12,7 +12,12 @@ import java.util.List;
 @Repository
 public interface AttendanceJpaRepository extends JpaRepository<Attendance, Long> {
     //테스트 완
-    Attendance findByAttandanceId(long attendanceId);
+    @Query(value = "select a from Attendance a " +
+            "join GroupAttendence ga on a.attandanceId = ga.attendance.attandanceId " +
+            "join MemberAttendance ma on a.attandanceId = ma.attendance.attandanceId " +
+            "where ga.group.groupName = :groupName and ma.member.memberName = :memberName and " +
+            "a.date = :date")
+    Attendance findAttandanceByGroupNameAndMemberNameAndDate(String groupName, String memberName, LocalDate date);
 
     //테스트 완
     @Query(value = "select a from Attendance a " +

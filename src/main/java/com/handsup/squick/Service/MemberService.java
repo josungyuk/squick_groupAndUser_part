@@ -29,65 +29,11 @@ public class MemberService {
 
     private final MemberGroupJpaRepository memberGroupJpaRepository;
 
-    // 그룹 내 한 회원의 출결상태별 수
-    public AttendCountDto getMemberDetail(long groupId, long memberId){
-        List<Attendance> attendList = attendanceJpaRepository.findAllAttendanceByGroupIdAndMemberId(groupId, memberId);
-
-        int attend = 0;
-        int absent = 0;
-        int late = 0;
-
-        while(!attendList.isEmpty()){
-            Attendance attendStatus = attendList.remove(0);
-
-            switch(attendStatus.getAttendanceStatus()){
-                case STATUS_ATTEND:
-                    attend++;
-                    break;
-                case STATUS_ABSENT:
-                    absent++;
-                    break;
-                case STATUS_LATE:
-                    late++;
-                    break;
-            }
-        }
-
-        return AttendCountDto.builder()
-                .attend(attend)
-                .absent(absent)
-                .late(late)
-                .build();
-    }
-
-    public List getMemberAttendance(long groupId, long memberId, LocalDate date){
-        List<Attendance> attendances = attendanceJpaRepository.findDateAttendanceByGroupIdAndMemberIdAndDate(groupId, memberId, date);
-
-        return attendances;
-    }
-
-    public void updateMemberAttendance(long attnedanceId, String status){
-        Attendance attendance = attendanceJpaRepository.findByAttandanceId(attnedanceId);
-
-        switch(status){
-            case "ATTEND":
-                attendance.setAttendanceStatus(Attendance.AttendanceStatus.STATUS_ATTEND);
-                break;
-            case "ABSENT":
-                attendance.setAttendanceStatus(Attendance.AttendanceStatus.STATUS_ABSENT);
-                break;
-            case "LATE":
-                attendance.setAttendanceStatus(Attendance.AttendanceStatus.STATUS_LATE);
-                break;
-        }
-
-        attendanceJpaRepository.save(attendance);
-    }
-
     public void setPin(long memberId){
         Member member = memberJpaRepository.findMemberByMemberId(memberId);
 
         member.setPin(!member.isPin());
+        memberJpaRepository.save(member);
     }
 
     public void expelMember(MemberExpelDto dto){
@@ -98,20 +44,24 @@ public class MemberService {
         MemberGroup memberGroup = memberGroupJpaRepository.findByMemberId(memberId);
 
         memberGroupJpaRepository.delete(memberGroup);
+        memberJpaRepository.delete(member);
     }
 
-
+    //테스트 완
     public List getMember(long groupId){
         List<Member> members = memberJpaRepository.findMemberByGroupId(groupId);
 
         return members;
     }
 
+    //테스트 완
     public void participate(ParticipationDto dto){
         Member member = memberJpaRepository.findMemberByMemberId(dto.getMemberId());
-        member.setInvitationStatus(Member.InvitationStatus.INVITATION_ACCEPT);
-
         Group group = groupJpaRepository.findByGroupId(dto.getGroupId());
+
+        member.setInvitationStatus(Member.InvitationStatus.INVITATION_ACCEPT);
+        member.setGroupName(group.getGroupName());
+        memberJpaRepository.save(member);
 
         MemberGroup memberGroup = MemberGroup.builder()
                 .member(member)
@@ -119,9 +69,9 @@ public class MemberService {
                 .build();
 
         memberGroupJpaRepository.save(memberGroup);
-        memberJpaRepository.save(member);
     }
 
+    //테스트 완
     public List getWaitMember(long groupId){
         List<Member> members = memberJpaRepository.findMemberByGroupId(groupId);
 

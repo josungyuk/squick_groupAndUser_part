@@ -78,7 +78,8 @@ public class AttendanceRepositoryTest {
         Member saveMember = memberJpaRepository.save(member);
         Attendance saveAttendance = attendanceJpaRepository.save(attendance);
 
-        Attendance testAttendance = attendanceJpaRepository.findByAttandanceId(id);
+        Attendance testAttendance = attendanceJpaRepository.findAttandanceByGroupNameAndMemberNameAndDate(
+                group.getGroupName(), member.getMemberName(), date);
 
         assertThat(attendance.getAttandanceId(), is(equalTo(testAttendance.getAttandanceId())));
     }

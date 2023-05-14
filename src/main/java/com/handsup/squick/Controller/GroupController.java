@@ -1,6 +1,7 @@
 package com.handsup.squick.Controller;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.handsup.squick.Dto.AttendanceDto.AttendanceUpdate;
 import com.handsup.squick.Dto.GroupDto.Attend.AttendCountDto;
 import com.handsup.squick.Dto.GroupDto.Attend.AttendStatus;
 import com.handsup.squick.Dto.MemberDto.MemberAddDto;
@@ -10,6 +11,7 @@ import com.handsup.squick.Entity.Attendance;
 import com.handsup.squick.Entity.Group;
 import com.handsup.squick.Dto.GroupDto.GroupCreateDto;
 import com.handsup.squick.Entity.Member;
+import com.handsup.squick.Service.AttendanceService;
 import com.handsup.squick.Service.GroupService;
 import com.handsup.squick.Service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ import java.util.List;
 public class GroupController {
     private final GroupService groupService;
     private final MemberService memberService;
+    private final AttendanceService attendanceService;
 
     @GetMapping("/")            //완
     public ResponseEntity getGroup(@RequestHeader("AccessToken") String accessToken){
@@ -132,7 +135,7 @@ public class GroupController {
     public ResponseEntity getMemberDetail(@RequestHeader("AccessToken") String accessToken,
                                  @RequestParam("groupId") long groupId,
                                  @RequestParam("memberId") long memberId){
-        AttendCountDto response = memberService.getMemberDetail(groupId, memberId);
+        AttendCountDto response = attendanceService.getMemberDetail(groupId, memberId);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -143,17 +146,16 @@ public class GroupController {
                                           @RequestParam("memberId") long memberId,
                                           @RequestParam("date") String date){
         LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
-        List<Attendance> response = memberService.getMemberAttendance(groupId, memberId, localDate);
+        List<Attendance> response = attendanceService.getMemberAttendance(groupId, memberId, localDate);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PutMapping("members/attendance/{attendanceId}")            //완
+    @PutMapping("members/attendance/update")            //완
     public ResponseEntity updateMemberAttendance(@RequestHeader("AccessToken") String accessToken,
-                                          @PathVariable("attendanceId") long attendanceId,
-                                          @RequestParam("status") String status){
-        memberService.updateMemberAttendance(attendanceId, status);
+                                                 @RequestBody AttendanceUpdate dto){
+        boolean response = attendanceService.updateMemberAttendance(dto);
 
-        return new ResponseEntity<>(true, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
