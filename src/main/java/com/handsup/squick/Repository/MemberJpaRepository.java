@@ -12,6 +12,12 @@ import java.util.List;
 @Repository
 public interface MemberJpaRepository extends JpaRepository<Member, Long> {
 
+    @Query("select m from Member m " +
+            "join MemberGroup mg on mg.member.memberId = m.memberId " +
+            "join Group g on mg.group.groupId = g.groupId " +
+            "where g.groupId = :groupId and m.memberName = :memberName")
+    Member findMemberByGroupIdAndMemberName(long groupId, String memberName);
+
     //테스트 완
     Member findMemberByMemberName(String memberName);
 

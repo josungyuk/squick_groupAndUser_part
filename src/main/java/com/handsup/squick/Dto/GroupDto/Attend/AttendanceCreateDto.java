@@ -8,7 +8,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AttendanceCreateDto {
-    long groupId;
+    String groupName;
+    String memberName;
     int timeLeft;
     String authCode;
     double latitude;

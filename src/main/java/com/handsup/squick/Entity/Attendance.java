@@ -38,6 +38,12 @@ public class Attendance {
     @Column(name = "memberName")
     String memberName;
 
+    @Column(name = "latitude")
+    double latitude;
+
+    @Column(name = "longitude")
+    double longitude;
+
     @OneToMany(mappedBy = "attendance", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     List<MemberAttendance> memberAttendances = new ArrayList<>();
 

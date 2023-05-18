@@ -1,14 +1,14 @@
 package com.handsup.squick.ServiceTest;
 
-import com.handsup.squick.Dto.AttendanceDto.AttendanceUpdate;
+import com.handsup.squick.Dto.GroupDto.Attend.AttendCountDto;
 import com.handsup.squick.Entity.Attendance;
+import com.handsup.squick.Entity.Group;
+import com.handsup.squick.Entity.Member;
 import com.handsup.squick.Repository.AttendanceJpaRepository;
 import com.handsup.squick.Repository.GroupJpaRepository;
 import com.handsup.squick.Repository.JoinRepo.MemberGroupJpaRepository;
 import com.handsup.squick.Repository.MemberJpaRepository;
 import com.handsup.squick.Service.AttendanceService;
-import com.handsup.squick.Service.GroupService;
-import net.bytebuddy.asm.Advice;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,6 +17,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -40,6 +42,89 @@ public class AttendanceServiceTest {
 
     @Mock
     private AttendanceJpaRepository attendanceJpaRepository;
+
+    @Test
+    void getMemberDetail(){
+        LocalDate date1 = LocalDate.of(2023, 5, 5);
+        LocalDate date2 = LocalDate.of(2023, 4, 4);
+        LocalDate date3 = LocalDate.of(2023, 7, 7);
+        LocalDate date4 = LocalDate.of(2023, 7, 8);
+        long id = 1L;
+
+        Group group = Group.builder()
+                .groupId(id)
+                .groupName("TestGroup")
+                .description("blabla")
+                .masterName("TestMember")
+                .img("img")
+                .invitationCode("aaaaaa")
+                .build();
+
+        Member member = Member.builder()
+                .memberId(id)
+                .memberName("Member")
+                .isPin(true)
+                .invitationStatus(Member.InvitationStatus.INVITATION_ACCEPT)
+                .email("test@test.com")
+                .img("TestImg")
+                .build();
+
+        Attendance attendance1 = Attendance.builder()
+                .attandanceId(1L)
+                .day(0)
+                .date(date1)
+                .attendanceStatus(Attendance.AttendanceStatus.STATUS_ATTEND)
+                .groupName(group.getGroupName())
+                .memberName(member.getMemberName())
+                .build();
+
+        Attendance attendance2 = Attendance.builder()
+                .attandanceId(2L)
+                .day(0)
+                .date(date2)
+                .attendanceStatus(Attendance.AttendanceStatus.STATUS_ABSENT)
+                .groupName(group.getGroupName())
+                .memberName(member.getMemberName())
+                .build();
+
+        Attendance attendance3 = Attendance.builder()
+                .attandanceId(3L)
+                .day(0)
+                .date(date4)
+                .attendanceStatus(Attendance.AttendanceStatus.STATUS_LATE)
+                .groupName(group.getGroupName())
+                .memberName(member.getMemberName())
+                .build();
+
+        Attendance attendance4 = Attendance.builder()
+                .attandanceId(4L)
+                .day(0)
+                .date(date3)
+                .attendanceStatus(Attendance.AttendanceStatus.STATUS_LATE)
+                .groupName(group.getGroupName())
+                .memberName(member.getMemberName())
+                .build();
+
+        List<Attendance> attendances = new ArrayList<>();
+        attendances.add(attendance1);
+        attendances.add(attendance2);
+        attendances.add(attendance3);
+        attendances.add(attendance4);
+
+        AttendCountDto attendCountDto = AttendCountDto.builder()
+                .attend(1)
+                .absent(1)
+                .late(2)
+                .build();
+
+        given(attendanceJpaRepository.findAllAttendanceByGroupIdAndMemberId(group.getGroupId(), member.getMemberId())).willReturn(attendances);
+
+        AttendCountDto testDto = attendanceService.getMemberDetail(group.getGroupId(), member.getMemberId());
+
+        assertThat(attendCountDto.getAttend(), is(equalTo(testDto.getAttend())));
+        assertThat(attendCountDto.getAbsent(), is(equalTo(testDto.getAbsent())));
+        assertThat(attendCountDto.getLate(), is(equalTo(testDto.getLate())));
+    }
 
     @Test
     void updateMemberAttendance(){

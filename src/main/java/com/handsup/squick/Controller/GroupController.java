@@ -1,7 +1,7 @@
 package com.handsup.squick.Controller;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.handsup.squick.Dto.AttendanceDto.AttendanceUpdate;
+import com.handsup.squick.Dto.AttendanceDto.AttendanceUpdateDto;
 import com.handsup.squick.Dto.GroupDto.Attend.AttendCountDto;
 import com.handsup.squick.Dto.GroupDto.Attend.AttendStatus;
 import com.handsup.squick.Dto.MemberDto.MemberAddDto;
@@ -28,7 +28,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/group")
+@RequestMapping("/groups")
 public class GroupController {
     private final GroupService groupService;
     private final MemberService memberService;
@@ -42,7 +42,7 @@ public class GroupController {
     }
     @GetMapping("/members/{groupId}")           //완
     public ResponseEntity getMember(@RequestHeader("AccessToken") String accessToken,
-                                    @RequestParam("groupId") long groupId){
+                                    @PathVariable("groupId") long groupId){
 
         List<Group> response = memberService.getMember(groupId);
 
@@ -52,7 +52,7 @@ public class GroupController {
 
     @GetMapping("/participate/{groupId}")           //완
     public ResponseEntity getParticipate(@RequestHeader("AccessToken") String accessToken,
-                                         @RequestParam("groupId") long groupId){
+                                         @PathVariable("groupId") long groupId){
         List<Member> response = memberService.getWaitMember(groupId);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -75,7 +75,7 @@ public class GroupController {
     @GetMapping("/attendance/{groupId}")            //완
     public ResponseEntity getAttendanceStatus(@RequestHeader("AccessToken") String accessToken,
                                               @RequestParam("date") @JsonFormat(pattern = "yyyy-MM-dd") LocalDate date,
-                                              @RequestParam("groupId") long groupId){
+                                              @PathVariable("groupId") long groupId){
         HashMap<Integer, List<AttendStatus>> response = groupService.getAttendanceStatus(date, groupId);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -83,7 +83,7 @@ public class GroupController {
 
     @PostMapping("/members/{groupId}")          //완
     public ResponseEntity joinGroup(@RequestHeader("AccessToken") String accessToken,
-                                    @RequestParam("groupId") long groupId,
+                                    @PathVariable("groupId") long groupId,
                                     @RequestBody MemberAddDto dto){
         boolean response = groupService.isVaildCode(groupId, dto);
 
@@ -153,7 +153,7 @@ public class GroupController {
 
     @PutMapping("members/attendance/update")            //완
     public ResponseEntity updateMemberAttendance(@RequestHeader("AccessToken") String accessToken,
-                                                 @RequestBody AttendanceUpdate dto){
+                                                 @RequestBody AttendanceUpdateDto dto){
         boolean response = attendanceService.updateMemberAttendance(dto);
 
         return new ResponseEntity<>(response, HttpStatus.OK);

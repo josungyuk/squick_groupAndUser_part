@@ -165,7 +165,9 @@ public class AttendanceRepositoryTest {
 
     @Test
     void findDateAttendanceByGroupIdAndMemberIdAndDateTest(){
-        LocalDate date = LocalDate.of(2023, 5, 5);
+        LocalDate date1 = LocalDate.of(2023, 5, 5);
+        LocalDate date2 = LocalDate.of(2023, 4, 4);
+        LocalDate date3 = LocalDate.of(2023, 7, 7);
         long id = 1L;
 
         Group group = Group.builder()
@@ -191,33 +193,66 @@ public class AttendanceRepositoryTest {
                 .group(group)
                 .build();
 
-        Attendance attendance = Attendance.builder()
-                .attandanceId(id)
+        Attendance attendance1 = Attendance.builder()
+                .attandanceId(1L)
                 .day(0)
-                .date(date)
+                .date(date1)
                 .attendanceStatus(Attendance.AttendanceStatus.STATUS_ATTEND)
                 .groupName(group.getGroupName())
                 .memberName(member.getMemberName())
                 .build();
 
-        GroupAttendence groupAttendence = GroupAttendence.builder()
+        Attendance attendance2 = Attendance.builder()
+                .attandanceId(2L)
+                .day(0)
+                .date(date2)
+                .attendanceStatus(Attendance.AttendanceStatus.STATUS_ATTEND)
+                .groupName(group.getGroupName())
+                .memberName(member.getMemberName())
+                .build();
+
+        Attendance attendance3 = Attendance.builder()
+                .attandanceId(3L)
+                .day(0)
+                .date(date3)
+                .attendanceStatus(Attendance.AttendanceStatus.STATUS_ATTEND)
+                .groupName(group.getGroupName())
+                .memberName(member.getMemberName())
+                .build();
+
+        GroupAttendence groupAttendence1 = GroupAttendence.builder()
                 .group(group)
-                .attendance(attendance)
+                .attendance(attendance1)
+                .build();
+
+        GroupAttendence groupAttendence2 = GroupAttendence.builder()
+                .group(group)
+                .attendance(attendance2)
+                .build();
+
+        GroupAttendence groupAttendence3 = GroupAttendence.builder()
+                .group(group)
+                .attendance(attendance3)
                 .build();
 
         //when
         Group saveGroup = groupJpaRepository.save(group);
         Member saveMember = memberJpaRepository.save(member);
         MemberGroup saveMg = memberGroupJpaRepository.save(memberGroup);
-        Attendance saveAttendance = attendanceJpaRepository.save(attendance);
-        GroupAttendence saveGroupAttendance = groupAttendanceJpaRepository.save(groupAttendence);
+        Attendance saveAttendance1 = attendanceJpaRepository.save(attendance1);
+        Attendance saveAttendance2 = attendanceJpaRepository.save(attendance2);
+        Attendance saveAttendance3 = attendanceJpaRepository.save(attendance3);
+        GroupAttendence saveGroupAttendance1 = groupAttendanceJpaRepository.save(groupAttendence1);
+        GroupAttendence saveGroupAttendance2 = groupAttendanceJpaRepository.save(groupAttendence2);
+        GroupAttendence saveGroupAttendance3 = groupAttendanceJpaRepository.save(groupAttendence3);
 
-        List<Attendance> testAttendanceList = attendanceJpaRepository.findDateAttendanceByGroupIdAndMemberIdAndDate(id, id, date);
+        List<Attendance> testAttendanceList = attendanceJpaRepository.findMonthAttendanceByGroupIdAndMemberIdAndDate(id, id, 2023, 5);
         Attendance testAttendance = testAttendanceList.get(0);
 
-        assertThat(attendance.getGroupName(), is(equalTo(testAttendance.getGroupName())));
-        assertThat(attendance.getMemberName(), is(equalTo(testAttendance.getMemberName())));
-        assertThat(attendance.getDate(), is(equalTo(testAttendance.getDate())));
+        assertThat(1, is(equalTo(testAttendanceList.size())));
+        assertThat(attendance1.getGroupName(), is(equalTo(testAttendance.getGroupName())));
+        assertThat(attendance1.getMemberName(), is(equalTo(testAttendance.getMemberName())));
+        assertThat(attendance1.getDate(), is(equalTo(testAttendance.getDate())));
     }
 
     @Test

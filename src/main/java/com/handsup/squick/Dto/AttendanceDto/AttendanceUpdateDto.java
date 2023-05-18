@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AttendanceUpdate {
+public class AttendanceUpdateDto {
     String groupName;
 
     String memberName;

@@ -30,8 +30,8 @@ public interface AttendanceJpaRepository extends JpaRepository<Attendance, Long>
     @Query(value = "select a from Attendance a " +
             "join GroupAttendence ga on a.attandanceId = ga.attendance.attandanceId " +
             "join MemberGroup mg on mg.group.groupId = ga.group.groupId " +
-            "where mg.group.groupId = :groupId and mg.member.memberId = :memberId and a.date = :date")
-    List<Attendance> findDateAttendanceByGroupIdAndMemberIdAndDate(long groupId, long memberId, LocalDate date);
+            "where mg.group.groupId = :groupId and mg.member.memberId = :memberId and function('YEAR', a.date) = :year and function('MONTH', a.date) = :month")
+    List<Attendance> findMonthAttendanceByGroupIdAndMemberIdAndDate(long groupId, long memberId, int year, int month);
 
     //테스트 완
     @Query(value = "select a from Attendance a " +

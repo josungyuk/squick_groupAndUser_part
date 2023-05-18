@@ -9,6 +9,11 @@ import java.util.List;
 
 @Repository
 public interface GroupJpaRepository extends JpaRepository<Group, Long> {
+
+    @Query("select g from Group g " +
+            "where g.groupName = :groupName")
+    Group findGroupByGroupName(String groupName);
+
     //테스트 완
     Group findByGroupId(long groupId);
 
