@@ -1,18 +1,15 @@
 package com.handsup.squick.ServiceTest;
 
-import com.handsup.squick.Dto.MemberDto.Participatation.ParticipationDto;
 import com.handsup.squick.Entity.Group;
 import com.handsup.squick.Entity.JoinEntity.MemberGroup;
 import com.handsup.squick.Entity.Member;
-import com.handsup.squick.Repository.AttendanceJpaRepository;
+import com.handsup.squick.Repository.SubAttendanceJpaRepository;
 import com.handsup.squick.Repository.GroupJpaRepository;
 import com.handsup.squick.Repository.JoinRepo.MemberGroupJpaRepository;
 import com.handsup.squick.Repository.MemberJpaRepository;
-import com.handsup.squick.Service.GroupService;
 import com.handsup.squick.Service.MemberService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -42,7 +39,7 @@ public class MemberServiceTest {
     private MemberGroupJpaRepository memberGroupJpaRepository;
 
     @Mock
-    private AttendanceJpaRepository attendanceJpaRepository;
+    private SubAttendanceJpaRepository subAttendanceJpaRepository;
 
 
     @Test

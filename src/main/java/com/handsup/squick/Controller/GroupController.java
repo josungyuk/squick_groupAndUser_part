@@ -7,7 +7,7 @@ import com.handsup.squick.Dto.GroupDto.Attend.AttendStatus;
 import com.handsup.squick.Dto.MemberDto.MemberAddDto;
 import com.handsup.squick.Dto.MemberDto.MemberExpelDto;
 import com.handsup.squick.Dto.MemberDto.Participatation.ParticipationDto;
-import com.handsup.squick.Entity.Attendance;
+import com.handsup.squick.Entity.SubAttendance;
 import com.handsup.squick.Entity.Group;
 import com.handsup.squick.Dto.GroupDto.GroupCreateDto;
 import com.handsup.squick.Entity.Member;
@@ -146,7 +146,7 @@ public class GroupController {
                                           @RequestParam("memberId") long memberId,
                                           @RequestParam("date") String date){
         LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
-        List<Attendance> response = attendanceService.getMemberAttendance(groupId, memberId, localDate);
+        List<SubAttendance> response = attendanceService.getMemberAttendance(groupId, memberId, localDate);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

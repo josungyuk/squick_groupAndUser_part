@@ -1,12 +1,10 @@
 package com.handsup.squick.Repository;
 
-import com.handsup.squick.Entity.Attendance;
 import com.handsup.squick.Entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Repository

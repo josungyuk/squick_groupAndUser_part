@@ -1,31 +1,21 @@
 package com.handsup.squick.ServiceTest;
 
-import com.google.gson.Gson;
 import com.handsup.squick.Dto.GroupDto.Attend.AttendStatus;
-import com.handsup.squick.Dto.GroupDto.GroupCreateDto;
 import com.handsup.squick.Dto.MemberDto.MemberAddDto;
-import com.handsup.squick.Entity.Attendance;
+import com.handsup.squick.Entity.SubAttendance;
 import com.handsup.squick.Entity.Group;
 import com.handsup.squick.Entity.JoinEntity.MemberGroup;
 import com.handsup.squick.Entity.Member;
-import com.handsup.squick.Repository.AttendanceJpaRepository;
+import com.handsup.squick.Repository.SubAttendanceJpaRepository;
 import com.handsup.squick.Repository.GroupJpaRepository;
 import com.handsup.squick.Repository.JoinRepo.MemberGroupJpaRepository;
 import com.handsup.squick.Repository.MemberJpaRepository;
 import com.handsup.squick.Service.GroupService;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -53,7 +43,7 @@ public class GroupServiceTest {
     private MemberGroupJpaRepository memberGroupJpaRepository;
 
     @Mock
-    private AttendanceJpaRepository attendanceJpaRepository;
+    private SubAttendanceJpaRepository subAttendanceJpaRepository;
 
 
     @Test
@@ -253,18 +243,18 @@ public class GroupServiceTest {
                 .img("TestImg")
                 .build();
 
-        Attendance attendance1 = Attendance.builder()
+        SubAttendance subAttendance1 = SubAttendance.builder()
                 .day(0)
                 .date(date)
-                .attendanceStatus(Attendance.AttendanceStatus.STATUS_ATTEND)
+                .attendanceStatus(SubAttendance.AttendanceStatus.STATUS_ATTEND)
                 .groupName(group.getGroupName())
                 .memberName(member1.getMemberName())
                 .build();
 
-        Attendance attendance2 = Attendance.builder()
+        SubAttendance subAttendance2 = SubAttendance.builder()
                 .day(0)
                 .date(date)
-                .attendanceStatus(Attendance.AttendanceStatus.STATUS_ABSENT)
+                .attendanceStatus(SubAttendance.AttendanceStatus.STATUS_ABSENT)
                 .groupName(group.getGroupName())
                 .memberName(member2.getMemberName())
                 .build();
@@ -287,12 +277,12 @@ public class GroupServiceTest {
         membersId.add(member2.getMemberId());
 
         //attendanceJpaRepository.findGroupCurAttendStatus의 member1 Id 를 검색하여 반환된 결과
-        List<Attendance> member1Attend = new ArrayList<>();
-        member1Attend.add(attendance1);
+        List<SubAttendance> member1Attend = new ArrayList<>();
+        member1Attend.add(subAttendance1);
 
         //attendanceJpaRepository.findGroupCurAttendStatus의 member2 Id 를 검색하여 반환된 결과
-        List<Attendance> member2Attend = new ArrayList<>();
-        member2Attend.add(attendance2);
+        List<SubAttendance> member2Attend = new ArrayList<>();
+        member2Attend.add(subAttendance2);
 
         //groupService.getAttendanceStatus의 반환된 결과
         List<AttendStatus> list1 = new ArrayList<>();
@@ -307,8 +297,8 @@ public class GroupServiceTest {
         map.put(2, list2);
 
         given(groupJpaRepository.findMemberIdByGroupId(group.getGroupId())).willReturn(membersId);
-        given(attendanceJpaRepository.findGroupCurAttendStatus(date, group.getGroupId(), membersId.get(0))).willReturn(member1Attend);
-        given(attendanceJpaRepository.findGroupCurAttendStatus(date, group.getGroupId(), membersId.get(1))).willReturn(member2Attend);
+        given(subAttendanceJpaRepository.findGroupCurAttendStatus(date, group.getGroupId(), membersId.get(0))).willReturn(member1Attend);
+        given(subAttendanceJpaRepository.findGroupCurAttendStatus(date, group.getGroupId(), membersId.get(1))).willReturn(member2Attend);
 
         //when
         HashMap<Integer, List<AttendStatus>> testMap = groupService.getAttendanceStatus(date, group.getGroupId());

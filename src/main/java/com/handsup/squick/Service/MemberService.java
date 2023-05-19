@@ -1,20 +1,17 @@
 package com.handsup.squick.Service;
 
-import com.handsup.squick.Dto.GroupDto.Attend.AttendCountDto;
 import com.handsup.squick.Dto.MemberDto.MemberExpelDto;
 import com.handsup.squick.Dto.MemberDto.Participatation.ParticipationDto;
-import com.handsup.squick.Entity.Attendance;
 import com.handsup.squick.Entity.Group;
 import com.handsup.squick.Entity.JoinEntity.MemberGroup;
 import com.handsup.squick.Entity.Member;
-import com.handsup.squick.Repository.AttendanceJpaRepository;
+import com.handsup.squick.Repository.SubAttendanceJpaRepository;
 import com.handsup.squick.Repository.GroupJpaRepository;
 import com.handsup.squick.Repository.JoinRepo.MemberGroupJpaRepository;
 import com.handsup.squick.Repository.MemberJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +22,7 @@ public class MemberService {
 
     private final GroupJpaRepository groupJpaRepository;
 
-    private final AttendanceJpaRepository attendanceJpaRepository;
+    private final SubAttendanceJpaRepository subAttendanceJpaRepository;
 
     private final MemberGroupJpaRepository memberGroupJpaRepository;
 

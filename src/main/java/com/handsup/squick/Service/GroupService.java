@@ -2,16 +2,14 @@ package com.handsup.squick.Service;
 
 import com.handsup.squick.Dto.GroupDto.Attend.AttendStatus;
 import com.handsup.squick.Dto.MemberDto.MemberAddDto;
-import com.handsup.squick.Dto.MemberDto.MemberExpelDto;
-import com.handsup.squick.Dto.MemberDto.Participatation.ParticipationDto;
-import com.handsup.squick.Entity.Attendance;
+import com.handsup.squick.Entity.SubAttendance;
 import com.handsup.squick.Entity.Group;
 import com.handsup.squick.Entity.JoinEntity.MemberGroup;
 import com.handsup.squick.Entity.Member;
 import com.handsup.squick.Dto.GroupDto.GroupCreateDto;
 import com.handsup.squick.Mapper.GroupMapper;
 import com.handsup.squick.Mapper.MemberMapper;
-import com.handsup.squick.Repository.AttendanceJpaRepository;
+import com.handsup.squick.Repository.SubAttendanceJpaRepository;
 import com.handsup.squick.Repository.GroupJpaRepository;
 import com.handsup.squick.Repository.JoinRepo.MemberGroupJpaRepository;
 import com.handsup.squick.Repository.MemberJpaRepository;
@@ -28,7 +26,7 @@ import java.util.*;
 public class GroupService{
     private final GroupJpaRepository groupJpaRepository;
     private final MemberJpaRepository memberJpaRepository;
-    private final AttendanceJpaRepository attendanceJpaRepository;
+    private final SubAttendanceJpaRepository subAttendanceJpaRepository;
     private final MemberGroupJpaRepository memberGroupJpaRepository;
     private final GroupMapper groupMapper;
     private final MemberMapper memberMapper;
@@ -132,23 +130,23 @@ public class GroupService{
         HashMap<Integer, List<AttendStatus>> map = new HashMap<>();
         int idx = 0;
         for(long memberId : membersId){
-            List<Attendance> attendances = attendanceJpaRepository.findGroupCurAttendStatus(date, groupId, memberId);
+            List<SubAttendance> subAttendances = subAttendanceJpaRepository.findGroupCurAttendStatus(date, groupId, memberId);
 
             List<AttendStatus> attendStatuses = new ArrayList<>();
 
-            for(Attendance attendance : attendances) {
+            for(SubAttendance subAttendance : subAttendances) {
                 String status;
 
-                if(attendance.getAttendanceStatus() == Attendance.AttendanceStatus.STATUS_ATTEND)
+                if(subAttendance.getAttendanceStatus() == SubAttendance.AttendanceStatus.STATUS_ATTEND)
                     status = "ATTEND";
-                else if(attendance.getAttendanceStatus() == Attendance.AttendanceStatus.STATUS_ABSENT)
+                else if(subAttendance.getAttendanceStatus() == SubAttendance.AttendanceStatus.STATUS_ABSENT)
                     status = "ABSENT";
                 else
                     status = "LATE";
 
                 AttendStatus attendStatus = AttendStatus.builder()
-                        .memberName(attendance.getMemberName())
-                        .date(attendance.getDate())
+                        .memberName(subAttendance.getMemberName())
+                        .date(subAttendance.getDate())
                         .state(status)
                         .build();
 

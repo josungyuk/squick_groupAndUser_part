@@ -2,27 +2,26 @@ package com.handsup.squick.Entity.JoinEntity;
 
 import com.handsup.squick.Entity.MasterAttendance;
 import com.handsup.squick.Entity.SubAttendance;
-import com.handsup.squick.Entity.Group;
 import lombok.*;
 
 import javax.persistence.*;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Builder
-@Table(name = "Group_Attendance")
-public class GroupAttendence {
+@Table(name = "Master_SubAttendance")
+public class MasterSubAttendance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "groupId")
-    Group group;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MasterAttendanceId")
+    @OneToOne(mappedBy = "masterAttendanceId")
+    @JoinColumn(name = "masterAttendanceId")
     MasterAttendance masterAttendance;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "subAttendanceId")
+    SubAttendance subAttendance;
 }

@@ -1,6 +1,7 @@
 package com.handsup.squick.Entity.JoinEntity;
 
-import com.handsup.squick.Entity.Attendance;
+import com.handsup.squick.Entity.MasterAttendance;
+import com.handsup.squick.Entity.SubAttendance;
 import com.handsup.squick.Entity.Member;
 import lombok.*;
 
@@ -24,5 +25,5 @@ public class MemberAttendance {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "attendanceId")
-    Attendance attendance;
+    MasterAttendance masterAttendance;
 }

@@ -3,18 +3,20 @@ package com.handsup.squick.Service;
 import com.handsup.squick.Dto.AttendanceDto.AttendanceUpdateDto;
 import com.handsup.squick.Dto.GroupDto.Attend.AttendCountDto;
 import com.handsup.squick.Dto.GroupDto.Attend.AttendanceCreateDto;
-import com.handsup.squick.Entity.Attendance;
+import com.handsup.squick.Entity.MasterAttendance;
+import com.handsup.squick.Entity.SubAttendance;
 import com.handsup.squick.Entity.Group;
 import com.handsup.squick.Entity.Member;
-import com.handsup.squick.Repository.AttendanceJpaRepository;
+import com.handsup.squick.Repository.MasterAttendanceJpaRepository;
+import com.handsup.squick.Repository.SubAttendanceJpaRepository;
 import com.handsup.squick.Repository.GroupJpaRepository;
 import com.handsup.squick.Repository.JoinRepo.MemberGroupJpaRepository;
 import com.handsup.squick.Repository.MemberJpaRepository;
 import lombok.RequiredArgsConstructor;
-import net.bytebuddy.asm.Advice;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.Period;
 import java.util.List;
 @Service
@@ -24,7 +26,9 @@ public class AttendanceService {
 
     private final GroupJpaRepository groupJpaRepository;
 
-    private final AttendanceJpaRepository attendanceJpaRepository;
+    private final SubAttendanceJpaRepository subAttendanceJpaRepository;
+
+    private final MasterAttendanceJpaRepository masterAttendanceJpaRepository;
 
     private final MemberGroupJpaRepository memberGroupJpaRepository;
 
@@ -52,14 +56,14 @@ public class AttendanceService {
 
     //테스트 완
     public AttendCountDto getMemberDetail(long groupId, long memberId){
-        List<Attendance> attendList = attendanceJpaRepository.findAllAttendanceByGroupIdAndMemberId(groupId, memberId);
+        List<SubAttendance> attendList = subAttendanceJpaRepository.findAllAttendanceByGroupIdAndMemberId(groupId, memberId);
 
         int attend = 0;
         int absent = 0;
         int late = 0;
 
         while(!attendList.isEmpty()){
-            Attendance attendStatus = attendList.remove(0);
+            SubAttendance attendStatus = attendList.remove(0);
 
             switch(attendStatus.getAttendanceStatus()){
                 case STATUS_ATTEND:
@@ -86,9 +90,9 @@ public class AttendanceService {
         int year = date.getYear();
         int month = date.getMonthValue();
 
-        List<Attendance> attendances = attendanceJpaRepository.findMonthAttendanceByGroupIdAndMemberIdAndDate(groupId, memberId, year, month);
+        List<SubAttendance> subAttendances = subAttendanceJpaRepository.findMonthAttendanceByGroupIdAndMemberIdAndDate(groupId, memberId, year, month);
 
-        return attendances;
+        return subAttendances;
     }
 
     //테스트 완
@@ -98,23 +102,23 @@ public class AttendanceService {
         LocalDate date = dto.getDate();
         String status = dto.getStatus();
 
-        Attendance attendance = attendanceJpaRepository.findAttandanceByGroupNameAndMemberNameAndDate(
+        SubAttendance subAttendance = subAttendanceJpaRepository.findAttandanceByGroupNameAndMemberNameAndDate(
                 groupName, memberName, date
         );
 
         switch(status){
             case "ATTEND":
-                attendance.setAttendanceStatus(Attendance.AttendanceStatus.STATUS_ATTEND);
+                subAttendance.setAttendanceStatus(SubAttendance.AttendanceStatus.STATUS_ATTEND);
                 break;
             case "ABSENT":
-                attendance.setAttendanceStatus(Attendance.AttendanceStatus.STATUS_ABSENT);
+                subAttendance.setAttendanceStatus(SubAttendance.AttendanceStatus.STATUS_ABSENT);
                 break;
             case "LATE":
-                attendance.setAttendanceStatus(Attendance.AttendanceStatus.STATUS_LATE);
+                subAttendance.setAttendanceStatus(SubAttendance.AttendanceStatus.STATUS_LATE);
                 break;
         }
 
-        attendanceJpaRepository.save(attendance);
+        subAttendanceJpaRepository.save(subAttendance);
         return true;
     }
 
@@ -122,17 +126,18 @@ public class AttendanceService {
         double latitude = dto.getLatitude();
         double longitude = dto.getLongitude();
 
-        Attendance attendance = Attendance.builder()
+        MasterAttendance masterAttendance = MasterAttendance.builder()
                 .date(LocalDate.now())
+                .time(LocalTime.now())
                 .memberName(dto.getMemberName())
                 .groupName(dto.getGroupName())
                 .day(1)
-                .attendanceStatus(Attendance.AttendanceStatus.STATUS_ATTEND)
+                .attendanceStatus(MasterAttendance.AttendanceStatus.STATUS_ATTEND)
                 .latitude(latitude)
                 .longitude(longitude)
                 .build();
 
-        attendanceJpaRepository.save(attendance);
+        masterAttendanceJpaRepository.save(masterAttendance);
 
         return true;
     }
@@ -145,35 +150,29 @@ public class AttendanceService {
         Group group = groupJpaRepository.findGroupByGroupName(dto.getGroupName());
         Member master = memberJpaRepository.findMemberByGroupIdAndMemberName(group.getGroupId(), group.getMasterName());
 
-        String groupName = group.getGroupName();
-        String masterName = group.getMasterName();
         long groupId = group.getGroupId();
         long masterId = master.getMemberId();
 
-        List<Attendance> attendances = attendanceJpaRepository.findAllAttendanceByGroupIdAndMemberId(groupId, masterId);
-        Attendance masterAttendance = attendances.get(attendances.size()-1);
-
-        LocalDate firstDay = attendances.get(0).getDate();
-        LocalDate lastDay = attendances.get(attendances.size() - 1).getDate();
-
-        Period period = Period.between(firstDay, lastDay);
+        List<MasterAttendance> masterAttendances = masterAttendanceJpaRepository.findMasterAttendanceByGroupIdAndMemberId(groupId, masterId);
+        MasterAttendance masterAttendance = masterAttendances.get(masterAttendances.size() - 1);
 
         double masterLatitude = masterAttendance.getLatitude();
-        double masterLongutude = masterAttendance.getLongitude();
+        double masterLongitude = masterAttendance.getLongitude();
+        int day = masterAttendance.getDay();
 
-        if(timeLeft <= 0 && !isRange(masterLatitude, masterLongutude, latitude, longitude)) return false;
+        if(timeLeft <= 0 && !isRange(masterLatitude, masterLongitude, latitude, longitude)) return false;
 
-        Attendance attendance = Attendance.builder()
+        SubAttendance subAttendance = SubAttendance.builder()
                 .date(LocalDate.now())
                 .memberName(dto.getMemberName())
                 .groupName(dto.getGroupName())
-                .day(period.getDays())
-                .attendanceStatus(Attendance.AttendanceStatus.STATUS_ATTEND)
+                .day(day + 1)
+                .attendanceStatus(SubAttendance.AttendanceStatus.STATUS_ATTEND)
                 .latitude(latitude)
                 .longitude(longitude)
                 .build();
 
-        attendanceJpaRepository.save(attendance);
+        subAttendanceJpaRepository.save(subAttendance);
 
         return true;
     }
