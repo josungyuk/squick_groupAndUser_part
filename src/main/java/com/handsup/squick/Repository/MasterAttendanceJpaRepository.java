@@ -15,4 +15,8 @@ public interface MasterAttendanceJpaRepository extends JpaRepository<MasterAtten
             "join MemberGroup mg on mg.group.groupId = ga.group.groupId " +
             "where mg.group.groupId = :groupId and mg.member.memberId = :memberId and ma.date = :date")
     List<MasterAttendance> findMasterAttendanceByGroupIdAndMemberId(long groupId, long memberId);
+
+    @Query("select ma from MasterAttendance ma " +
+            "where ma.groupName = :groupName and ma.date = :date")
+    MasterAttendance findMasterAttendanceByGroupNameAndDate(String groupName, LocalDate date);
 }

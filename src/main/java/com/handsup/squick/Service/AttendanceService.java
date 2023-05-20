@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Period;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 @Service
 @RequiredArgsConstructor
@@ -122,7 +123,7 @@ public class AttendanceService {
         return true;
     }
 
-    public boolean createAttendance(AttendanceCreateDto dto){
+    public long createAttendance(AttendanceCreateDto dto){
         double latitude = dto.getLatitude();
         double longitude = dto.getLongitude();
 
@@ -137,12 +138,12 @@ public class AttendanceService {
                 .longitude(longitude)
                 .build();
 
-        masterAttendanceJpaRepository.save(masterAttendance);
+        MasterAttendance saveMasterAttendance = masterAttendanceJpaRepository.save(masterAttendance);
 
-        return true;
+        return saveMasterAttendance.getMasterAttandanceId();
     }
 
-    public boolean bePresent(AttendanceCreateDto dto){
+    public long bePresent(AttendanceCreateDto dto){
         double latitude = dto.getLatitude();
         double longitude = dto.getLongitude();
         int timeLeft = dto.getTimeLeft();
@@ -160,7 +161,7 @@ public class AttendanceService {
         double masterLongitude = masterAttendance.getLongitude();
         int day = masterAttendance.getDay();
 
-        if(timeLeft <= 0 && !isRange(masterLatitude, masterLongitude, latitude, longitude)) return false;
+        if(timeLeft <= 0 && !isRange(masterLatitude, masterLongitude, latitude, longitude)) return -1;
 
         SubAttendance subAttendance = SubAttendance.builder()
                 .date(LocalDate.now())
@@ -172,8 +173,19 @@ public class AttendanceService {
                 .longitude(longitude)
                 .build();
 
-        subAttendanceJpaRepository.save(subAttendance);
+        SubAttendance saveSubAttendance = subAttendanceJpaRepository.save(subAttendance);
 
-        return true;
+        return saveSubAttendance.getSubAttandanceId();
+    }
+
+    public long getRemainingTime(long groupId){
+        LocalDate date = LocalDate.now();
+        String groupName = groupJpaRepository.findByGroupId(groupId).getGroupName();
+
+        MasterAttendance attendance = masterAttendanceJpaRepository.findMasterAttendanceByGroupNameAndDate(groupName, date);
+        LocalTime limit = attendance.getTime().plusMinutes(5);
+        long remainingTime = ChronoUnit.SECONDS.between(limit, LocalTime.now());
+
+        return remainingTime;
     }
 }

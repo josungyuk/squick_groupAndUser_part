@@ -2,6 +2,7 @@ package com.handsup.squick.Entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.handsup.squick.Entity.JoinEntity.GroupAttendence;
+import com.handsup.squick.Entity.JoinEntity.MasterSubAttendance;
 import com.handsup.squick.Entity.JoinEntity.MemberAttendance;
 import lombok.*;
 
@@ -30,6 +31,7 @@ public class MasterAttendance {
     LocalDate date;
 
     @Column(name = "time")
+    @JsonFormat(pattern = "kk:mm:ss")
     LocalTime time;
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
@@ -54,7 +56,7 @@ public class MasterAttendance {
     List<GroupAttendence> groupAttendences = new ArrayList<>();
 
     @OneToOne(mappedBy = "masterAttendance", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    MasterAttendance masterAttendance;
+    MasterSubAttendance masterSubAttendance;
 
     public enum AttendanceStatus{
         STATUS_ATTEND("참석"),

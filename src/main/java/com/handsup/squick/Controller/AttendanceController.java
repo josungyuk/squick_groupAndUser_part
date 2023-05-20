@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalTime;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("attendances")
@@ -17,15 +19,17 @@ public class AttendanceController {
     @PostMapping("/")
     ResponseEntity createAttendance(@RequestHeader("AccessToken") String accessToken,
                           @RequestBody AttendanceCreateDto dto){
-        boolean response = attendanceService.createAttendance(dto);
+        long response = attendanceService.createAttendance(dto);
 
-        return new ResponseEntity(response, HttpStatus.OK);
+        return new ResponseEntity(response, HttpStatus.CREATED);
     }
 
     @PostMapping("/attend")
     ResponseEntity presentAttendance(@RequestHeader("AccessToken") String accessToken,
                               @RequestBody AttendanceCreateDto dto){
-        boolean response = attendanceService.bePresent(dto);
+        long response = attendanceService.bePresent(dto);
+
+        if(response == -1) return new ResponseEntity(response, HttpStatus.ACCEPTED);
 
         return new ResponseEntity(response, HttpStatus.OK);
     }
@@ -37,9 +41,13 @@ public class AttendanceController {
     }
 
     @GetMapping("/timeLeft/{groupId}")
-    long getTimeLeft(@RequestHeader("AccessToken") String accessToken,
+    ResponseEntity getTimeLeft(@RequestHeader("AccessToken") String accessToken,
                           @PathVariable("groupId") long groupId){
 
+        long response = attendanceService.getRemainingTime(groupId);
+
+
+        return new ResponseEntity(response, HttpStatus.OK);
     }
 
     @PostMapping("/check/{attendanceId}")

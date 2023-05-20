@@ -31,6 +31,7 @@ public class SubAttendance {
     LocalDate date;
 
     @Column(name = "time")
+    @JsonFormat(pattern = "kk:mm:ss")
     LocalTime time;
 
     @Enumerated(EnumType.STRING)
