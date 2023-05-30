@@ -35,9 +35,13 @@ public class AttendanceController {
     }
 
     @PostMapping("/finish")
-    long finishAttendance(@RequestHeader("AccessToken") String accessToken,
+    ResponseEntity finishAttendance(@RequestHeader("AccessToken") String accessToken,
                           @RequestBody long attendanceId){
+        long response = attendanceService.finishAttendance(attendanceId);
 
+        if(response == -1) return new ResponseEntity(response, HttpStatus.ACCEPTED);
+
+        return new ResponseEntity(response, HttpStatus.OK);
     }
 
     @GetMapping("/timeLeft/{groupId}")
@@ -54,6 +58,8 @@ public class AttendanceController {
     long checkAttendance(@RequestHeader("AccessToken") String accessToken,
                           @PathVariable("attendanceId") long attendanceId,
                           @RequestBody AttendanceDto dto){
+
+
 
     }
 }

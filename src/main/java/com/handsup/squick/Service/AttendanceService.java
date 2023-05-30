@@ -1,5 +1,6 @@
 package com.handsup.squick.Service;
 
+import com.handsup.squick.Dto.AttendanceDto.AttendanceDto;
 import com.handsup.squick.Dto.AttendanceDto.AttendanceUpdateDto;
 import com.handsup.squick.Dto.GroupDto.Attend.AttendCountDto;
 import com.handsup.squick.Dto.GroupDto.Attend.AttendanceCreateDto;
@@ -133,6 +134,7 @@ public class AttendanceService {
                 .memberName(dto.getMemberName())
                 .groupName(dto.getGroupName())
                 .day(1)
+                .activation(true)
                 .attendanceStatus(MasterAttendance.AttendanceStatus.STATUS_ATTEND)
                 .latitude(latitude)
                 .longitude(longitude)
@@ -156,6 +158,8 @@ public class AttendanceService {
 
         List<MasterAttendance> masterAttendances = masterAttendanceJpaRepository.findMasterAttendanceByGroupIdAndMemberId(groupId, masterId);
         MasterAttendance masterAttendance = masterAttendances.get(masterAttendances.size() - 1);
+
+        if(!masterAttendance.isActivation()) return -1;
 
         double masterLatitude = masterAttendance.getLatitude();
         double masterLongitude = masterAttendance.getLongitude();
@@ -187,5 +191,24 @@ public class AttendanceService {
         long remainingTime = ChronoUnit.SECONDS.between(limit, LocalTime.now());
 
         return remainingTime;
+    }
+
+    public long finishAttendance(long attendanceId){
+        MasterAttendance masterAttendance = masterAttendanceJpaRepository.findRecentMasterAttendanceByMasterAttandanceId(attendanceId);
+
+        if(masterAttendance == null) return -1;
+
+        masterAttendance.setActivation(false);
+        masterAttendanceJpaRepository.save(masterAttendance);
+
+        return attendanceId;
+    }
+
+    public long checkAttendance(long attendanceId, AttendanceDto dto){
+        MasterAttendance masterAttendance = masterAttendanceJpaRepository.findRecentMasterAttendanceByMasterAttandanceId(attendanceId);
+        long masterAttendanceId = masterAttendance.getMasterAttandanceId();
+
+
+
     }
 }
