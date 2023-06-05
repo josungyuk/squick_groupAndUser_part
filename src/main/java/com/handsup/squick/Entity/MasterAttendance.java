@@ -37,6 +37,9 @@ public class MasterAttendance {
     @Column(name = "status")
     AttendanceStatus attendanceStatus;
 
+    @Column
+    boolean activation;
+
     @Column(name = "groupName")
     String groupName;
 
@@ -49,10 +52,10 @@ public class MasterAttendance {
     @Column(name = "longitude")
     double longitude;
 
-    @OneToMany(mappedBy = "attendance", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "masterAttendance", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     List<MemberAttendance> memberAttendances = new ArrayList<>();
 
-    @OneToMany(mappedBy = "attendance", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "masterAttendance", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     List<GroupAttendence> groupAttendences = new ArrayList<>();
 
     @OneToOne(mappedBy = "masterAttendance", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

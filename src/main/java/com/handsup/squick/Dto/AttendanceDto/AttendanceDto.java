@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AttendanceDto {
-    long userId;
+    long memberId;
     double latitude; //위도
     double longitude; //경도
     String authCode;

@@ -17,8 +17,8 @@ public class MasterSubAttendance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
-    @OneToOne(mappedBy = "masterAttendanceId")
-    @JoinColumn(name = "masterAttendanceId")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "masterAttandanceId")
     MasterAttendance masterAttendance;
 
     @ManyToOne(fetch = FetchType.LAZY)

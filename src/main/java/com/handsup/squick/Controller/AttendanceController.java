@@ -50,16 +50,16 @@ public class AttendanceController {
 
         long response = attendanceService.getRemainingTime(groupId);
 
-
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
     @PostMapping("/check/{attendanceId}")
-    long checkAttendance(@RequestHeader("AccessToken") String accessToken,
+    ResponseEntity checkAttendance(@RequestHeader("AccessToken") String accessToken,
                           @PathVariable("attendanceId") long attendanceId,
                           @RequestBody AttendanceDto dto){
 
+        long response = attendanceService.checkAttendance(attendanceId, dto);
 
-
+        return new ResponseEntity(response, HttpStatus.OK);
     }
 }

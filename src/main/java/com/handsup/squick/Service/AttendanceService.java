@@ -4,10 +4,12 @@ import com.handsup.squick.Dto.AttendanceDto.AttendanceDto;
 import com.handsup.squick.Dto.AttendanceDto.AttendanceUpdateDto;
 import com.handsup.squick.Dto.GroupDto.Attend.AttendCountDto;
 import com.handsup.squick.Dto.GroupDto.Attend.AttendanceCreateDto;
+import com.handsup.squick.Entity.JoinEntity.MasterSubAttendance;
 import com.handsup.squick.Entity.MasterAttendance;
 import com.handsup.squick.Entity.SubAttendance;
 import com.handsup.squick.Entity.Group;
 import com.handsup.squick.Entity.Member;
+import com.handsup.squick.Repository.JoinRepo.MasterSubAttendanceJpaRepository;
 import com.handsup.squick.Repository.MasterAttendanceJpaRepository;
 import com.handsup.squick.Repository.SubAttendanceJpaRepository;
 import com.handsup.squick.Repository.GroupJpaRepository;
@@ -31,6 +33,8 @@ public class AttendanceService {
     private final SubAttendanceJpaRepository subAttendanceJpaRepository;
 
     private final MasterAttendanceJpaRepository masterAttendanceJpaRepository;
+
+    private final MasterSubAttendanceJpaRepository masterSubAttendanceJpaRepository;
 
     private final MemberGroupJpaRepository memberGroupJpaRepository;
 
@@ -177,7 +181,13 @@ public class AttendanceService {
                 .longitude(longitude)
                 .build();
 
+        MasterSubAttendance masterSubAttendance = MasterSubAttendance.builder()
+                .masterAttendance(masterAttendance)
+                .subAttendance(subAttendance)
+                .build();
+
         SubAttendance saveSubAttendance = subAttendanceJpaRepository.save(subAttendance);
+        masterSubAttendanceJpaRepository.save(masterSubAttendance);
 
         return saveSubAttendance.getSubAttandanceId();
     }
@@ -208,7 +218,10 @@ public class AttendanceService {
         MasterAttendance masterAttendance = masterAttendanceJpaRepository.findRecentMasterAttendanceByMasterAttandanceId(attendanceId);
         long masterAttendanceId = masterAttendance.getMasterAttandanceId();
 
+        SubAttendance subAttendance = subAttendanceJpaRepository.findById(attendanceId);
 
+        if(subAttendance == null) return -1;
 
+        return subAttendance.getSubAttandanceId();
     }
 }

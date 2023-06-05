@@ -50,12 +50,6 @@ public class SubAttendance {
     @Column(name = "longitude")
     double longitude;
 
-    @OneToMany(mappedBy = "attendance", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    List<MemberAttendance> memberAttendances = new ArrayList<>();
-
-    @OneToMany(mappedBy = "attendance", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    List<GroupAttendence> groupAttendences = new ArrayList<>();
-
     @OneToMany(mappedBy = "subAttendance", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     List<MasterSubAttendance> masterSubAttendances = new ArrayList<>();
 

@@ -23,6 +23,6 @@ public class GroupAttendence {
     Group group;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MasterAttendanceId")
+    @JoinColumn(name = "masterAttandanceId")
     MasterAttendance masterAttendance;
 }

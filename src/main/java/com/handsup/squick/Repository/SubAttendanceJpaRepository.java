@@ -10,11 +10,13 @@ import java.util.List;
 
 @Repository
 public interface SubAttendanceJpaRepository extends JpaRepository<SubAttendance, Long> {
+
+    SubAttendance findById(long attendanceId);
     //테스트 완
     @Query(value = "select sa from SubAttendance sa " +
             "join MasterSubAttendance msa on sa.subAttandanceId = msa.subAttendance.subAttandanceId " +
             "join GroupAttendence ga on msa.masterAttendance.masterAttandanceId = ga.masterAttendance.masterAttandanceId " +
-            "where ga.group.groupName = :groupName and ma.member.memberName = :memberName and " +
+            "where ga.group.groupName = :groupName and msa.masterAttendance.memberName = :memberName and " +
             "sa.date = :date")
     SubAttendance findAttandanceByGroupNameAndMemberNameAndDate(String groupName, String memberName, LocalDate date);
 
@@ -31,7 +33,7 @@ public interface SubAttendanceJpaRepository extends JpaRepository<SubAttendance,
             "join MasterSubAttendance msa on sa.subAttandanceId = msa.subAttendance.subAttandanceId " +
             "join GroupAttendence ga on msa.masterAttendance.masterAttandanceId = ga.masterAttendance.masterAttandanceId " +
             "join MemberGroup mg on mg.group.groupId = ga.group.groupId " +
-            "where mg.group.groupId = :groupId and mg.member.memberId = :memberId and function('YEAR', a.date) = :year and function('MONTH', a.date) = :month")
+            "where mg.group.groupId = :groupId and mg.member.memberId = :memberId and function('YEAR', sa.date) = :year and function('MONTH', sa.date) = :month")
     List<SubAttendance> findMonthAttendanceByGroupIdAndMemberIdAndDate(long groupId, long memberId, int year, int month);
 
     //테스트 완

@@ -24,6 +24,6 @@ public class MemberAttendance {
     Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "attendanceId")
+    @JoinColumn(name = "masterAttandanceId")
     MasterAttendance masterAttendance;
 }
