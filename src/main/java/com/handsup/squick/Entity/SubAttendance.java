@@ -1,9 +1,7 @@
 package com.handsup.squick.Entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.handsup.squick.Entity.JoinEntity.GroupAttendence;
 import com.handsup.squick.Entity.JoinEntity.MasterSubAttendance;
-import com.handsup.squick.Entity.JoinEntity.MemberAttendance;
 import lombok.*;
 
 import javax.persistence.*;

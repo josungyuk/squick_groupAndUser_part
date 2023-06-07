@@ -1,6 +1,6 @@
 package com.handsup.squick.Entity;
 
-import com.handsup.squick.Entity.JoinEntity.GroupAttendence;
+import com.handsup.squick.Entity.JoinEntity.GroupAttendance;
 import com.handsup.squick.Entity.JoinEntity.MemberGroup;
 import lombok.*;
 
@@ -22,7 +22,7 @@ public class Group {
     long groupId;
     @Column(name = "groupName")
     String groupName;
-    @Column(name = "MasterName")
+    @Column(name = "masterName")
     String masterName;
     @Column(name = "img", length = 65536)
     String img;
@@ -37,7 +37,7 @@ public class Group {
 
 
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    List<GroupAttendence> groupAttendances = new ArrayList<>();
+    List<GroupAttendance> groupAttendances = new ArrayList<>();
 
 
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

@@ -1,7 +1,6 @@
 package com.handsup.squick.Entity.JoinEntity;
 
 import com.handsup.squick.Entity.MasterAttendance;
-import com.handsup.squick.Entity.SubAttendance;
 import com.handsup.squick.Entity.Group;
 import lombok.*;
 
@@ -13,7 +12,7 @@ import javax.persistence.*;
 @Entity
 @Builder
 @Table(name = "Group_Attendance")
-public class GroupAttendence {
+public class GroupAttendance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;

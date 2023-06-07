@@ -16,7 +16,10 @@ import com.handsup.squick.Repository.GroupJpaRepository;
 import com.handsup.squick.Repository.JoinRepo.MemberGroupJpaRepository;
 import com.handsup.squick.Repository.MemberJpaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -203,21 +206,26 @@ public class AttendanceService {
         return remainingTime;
     }
 
-    public long finishAttendance(long attendanceId){
-        MasterAttendance masterAttendance = masterAttendanceJpaRepository.findRecentMasterAttendanceByMasterAttandanceId(attendanceId);
+    public long finishAttendance(long groupId){
+        Pageable pageable = PageRequest.of(0,1);
+        Page<MasterAttendance> page = masterAttendanceJpaRepository.findRecentMasterAttendanceByMasterGroupId(groupId, pageable);
+        MasterAttendance masterAttendance = page.getContent().get(0);
 
         if(masterAttendance == null) return -1;
 
         masterAttendance.setActivation(false);
-        masterAttendanceJpaRepository.save(masterAttendance);
+        MasterAttendance result = masterAttendanceJpaRepository.save(masterAttendance);
 
-        return attendanceId;
+        return result.getMasterAttandanceId();
     }
 
-    public long checkAttendance(long attendanceId, AttendanceDto dto){
-        MasterAttendance masterAttendance = masterAttendanceJpaRepository.findRecentMasterAttendanceByMasterAttandanceId(attendanceId);
-        long masterAttendanceId = masterAttendance.getMasterAttandanceId();
+    //더 구현 필요.
+    public long checkAttendance(long attendanceId, long groupId, AttendanceDto dto){
+        Pageable pageable =  PageRequest.of(0,1);
+        Page<MasterAttendance> page = masterAttendanceJpaRepository.findRecentMasterAttendanceByMasterGroupId(groupId, pageable);
+        long masterAttendanceId = page.getContent().get(0).getMasterAttandanceId();
 
+        //이 부분부터 구현 필요
         SubAttendance subAttendance = subAttendanceJpaRepository.findById(attendanceId);
 
         if(subAttendance == null) return -1;

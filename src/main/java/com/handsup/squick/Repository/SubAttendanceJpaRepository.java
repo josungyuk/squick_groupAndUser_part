@@ -15,7 +15,7 @@ public interface SubAttendanceJpaRepository extends JpaRepository<SubAttendance,
     //테스트 완
     @Query(value = "select sa from SubAttendance sa " +
             "join MasterSubAttendance msa on sa.subAttandanceId = msa.subAttendance.subAttandanceId " +
-            "join GroupAttendence ga on msa.masterAttendance.masterAttandanceId = ga.masterAttendance.masterAttandanceId " +
+            "join GroupAttendance ga on msa.masterAttendance.masterAttandanceId = ga.masterAttendance.masterAttandanceId " +
             "where ga.group.groupName = :groupName and msa.masterAttendance.memberName = :memberName and " +
             "sa.date = :date")
     SubAttendance findAttandanceByGroupNameAndMemberNameAndDate(String groupName, String memberName, LocalDate date);
@@ -23,7 +23,7 @@ public interface SubAttendanceJpaRepository extends JpaRepository<SubAttendance,
     //테스트 완
     @Query(value = "select sa from SubAttendance sa " +
             "join MasterSubAttendance msa on sa.subAttandanceId = msa.subAttendance.subAttandanceId " +
-            "join GroupAttendence ga on ga.masterAttendance.masterAttandanceId = msa.masterAttendance.masterAttandanceId " +
+            "join GroupAttendance ga on ga.masterAttendance.masterAttandanceId = msa.masterAttendance.masterAttandanceId " +
             "join MemberGroup mg on mg.group.groupId = ga.group.groupId " +
             "where mg.group.groupId = :groupId and mg.member.memberId = :memberId")
     List<SubAttendance> findAllAttendanceByGroupIdAndMemberId(long groupId, long memberId);
@@ -31,7 +31,7 @@ public interface SubAttendanceJpaRepository extends JpaRepository<SubAttendance,
     //테스트 완
     @Query(value = "select sa from SubAttendance sa " +
             "join MasterSubAttendance msa on sa.subAttandanceId = msa.subAttendance.subAttandanceId " +
-            "join GroupAttendence ga on msa.masterAttendance.masterAttandanceId = ga.masterAttendance.masterAttandanceId " +
+            "join GroupAttendance ga on msa.masterAttendance.masterAttandanceId = ga.masterAttendance.masterAttandanceId " +
             "join MemberGroup mg on mg.group.groupId = ga.group.groupId " +
             "where mg.group.groupId = :groupId and mg.member.memberId = :memberId and function('YEAR', sa.date) = :year and function('MONTH', sa.date) = :month")
     List<SubAttendance> findMonthAttendanceByGroupIdAndMemberIdAndDate(long groupId, long memberId, int year, int month);
@@ -39,7 +39,7 @@ public interface SubAttendanceJpaRepository extends JpaRepository<SubAttendance,
     //테스트 완
     @Query(value = "select sa from SubAttendance sa " +
             "join MasterSubAttendance msa on sa.subAttandanceId = msa.subAttendance.subAttandanceId " +
-            "join GroupAttendence ga on msa.masterAttendance.masterAttandanceId = ga.masterAttendance.masterAttandanceId " +
+            "join GroupAttendance ga on msa.masterAttendance.masterAttandanceId = ga.masterAttendance.masterAttandanceId " +
             "join MemberGroup mg on ga.group.groupId = mg.member.memberId " +
             "where sa.date = :date and ga.group.groupId = :groupId and mg.member.memberId = :memberId")
     List<SubAttendance> findGroupCurAttendStatus(LocalDate date, long groupId, long memberId);

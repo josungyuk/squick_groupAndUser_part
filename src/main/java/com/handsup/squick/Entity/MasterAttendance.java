@@ -1,7 +1,7 @@
 package com.handsup.squick.Entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.handsup.squick.Entity.JoinEntity.GroupAttendence;
+import com.handsup.squick.Entity.JoinEntity.GroupAttendance;
 import com.handsup.squick.Entity.JoinEntity.MasterSubAttendance;
 import com.handsup.squick.Entity.JoinEntity.MemberAttendance;
 import lombok.*;
@@ -22,7 +22,7 @@ import java.util.List;
 public class MasterAttendance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "masterAttendanceId")
+    @Column(name = "masterAttandanceId")
     long masterAttandanceId;
     @Column(name = "day")
     int day;
@@ -46,6 +46,7 @@ public class MasterAttendance {
     @Column(name = "memberName")
     String memberName;
 
+
     @Column(name = "latitude")
     double latitude;
 
@@ -56,7 +57,7 @@ public class MasterAttendance {
     List<MemberAttendance> memberAttendances = new ArrayList<>();
 
     @OneToMany(mappedBy = "masterAttendance", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    List<GroupAttendence> groupAttendences = new ArrayList<>();
+    List<GroupAttendance> groupAttendances = new ArrayList<>();
 
     @OneToOne(mappedBy = "masterAttendance", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     MasterSubAttendance masterSubAttendance;

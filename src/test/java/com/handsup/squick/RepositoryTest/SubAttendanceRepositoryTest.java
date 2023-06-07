@@ -1,11 +1,14 @@
 package com.handsup.squick.RepositoryTest;
 
 import com.handsup.squick.Dto.GroupDto.Attend.AttendStatus;
+import com.handsup.squick.Entity.JoinEntity.MasterSubAttendance;
+import com.handsup.squick.Entity.MasterAttendance;
 import com.handsup.squick.Entity.SubAttendance;
 import com.handsup.squick.Entity.Group;
-import com.handsup.squick.Entity.JoinEntity.GroupAttendence;
+import com.handsup.squick.Entity.JoinEntity.GroupAttendance;
 import com.handsup.squick.Entity.JoinEntity.MemberGroup;
 import com.handsup.squick.Entity.Member;
+import com.handsup.squick.Repository.JoinRepo.MasterSubAttendanceJpaRepository;
 import com.handsup.squick.Repository.SubAttendanceJpaRepository;
 import com.handsup.squick.Repository.GroupJpaRepository;
 import com.handsup.squick.Repository.JoinRepo.GroupAttendanceJpaRepository;
@@ -41,6 +44,9 @@ public class SubAttendanceRepositoryTest {
     @Autowired
     GroupAttendanceJpaRepository groupAttendanceJpaRepository;
 
+    @Autowired
+    MasterSubAttendanceJpaRepository masterSubAttendanceJpaRepository;
+
     @Test
     void findByAttandanceIdTest(){
         LocalDate date = LocalDate.of(2023, 5, 5);
@@ -65,7 +71,7 @@ public class SubAttendanceRepositoryTest {
                 .build();
 
         SubAttendance subAttendance = SubAttendance.builder()
-                .attandanceId(id)
+                .subAttandanceId(id)
                 .day(0)
                 .date(date)
                 .attendanceStatus(SubAttendance.AttendanceStatus.STATUS_ATTEND)
@@ -80,7 +86,7 @@ public class SubAttendanceRepositoryTest {
         SubAttendance testSubAttendance = subAttendanceJpaRepository.findAttandanceByGroupNameAndMemberNameAndDate(
                 group.getGroupName(), member.getMemberName(), date);
 
-        assertThat(subAttendance.getAttandanceId(), is(equalTo(testSubAttendance.getAttandanceId())));
+        assertThat(subAttendance.getSubAttandanceId(), is(equalTo(testSubAttendance.getSubAttandanceId())));
     }
 
     @Test
@@ -112,8 +118,17 @@ public class SubAttendanceRepositoryTest {
                 .group(group)
                 .build();
 
+        MasterAttendance masterAttendance = MasterAttendance.builder()
+                .masterAttandanceId(1L)
+                .day(0)
+                .date(date1)
+                .attendanceStatus(MasterAttendance.AttendanceStatus.STATUS_ATTEND)
+                .groupName(group.getGroupName())
+                .memberName("master")
+                .build();
+
         SubAttendance subAttendance1 = SubAttendance.builder()
-                .attandanceId(1L)
+                .subAttandanceId(1L)
                 .day(0)
                 .date(date1)
                 .attendanceStatus(SubAttendance.AttendanceStatus.STATUS_ATTEND)
@@ -122,7 +137,7 @@ public class SubAttendanceRepositoryTest {
                 .build();
 
         SubAttendance subAttendance2 = SubAttendance.builder()
-                .attandanceId(2L)
+                .subAttandanceId(2L)
                 .day(0)
                 .date(date2)
                 .attendanceStatus(SubAttendance.AttendanceStatus.STATUS_ATTEND)
@@ -130,14 +145,24 @@ public class SubAttendanceRepositoryTest {
                 .memberName(member.getMemberName())
                 .build();
 
-        GroupAttendence groupAttendence1 = GroupAttendence.builder()
-                .group(group)
+        MasterSubAttendance masterSubAttendance1 = MasterSubAttendance.builder()
                 .subAttendance(subAttendance1)
+                .masterAttendance(masterAttendance)
                 .build();
 
-        GroupAttendence groupAttendence2 = GroupAttendence.builder()
-                .group(group)
+        MasterSubAttendance masterSubAttendance2 = MasterSubAttendance.builder()
                 .subAttendance(subAttendance2)
+                .masterAttendance(masterAttendance)
+                .build();
+
+        GroupAttendance groupAttendance1 = GroupAttendance.builder()
+                .group(group)
+                .masterAttendance(masterAttendance)
+                .build();
+
+        GroupAttendance groupAttendance2 = GroupAttendance.builder()
+                .group(group)
+                .masterAttendance(masterAttendance)
                 .build();
 
         //when
@@ -146,8 +171,10 @@ public class SubAttendanceRepositoryTest {
         MemberGroup saveMg = memberGroupJpaRepository.save(memberGroup);
         SubAttendance saveSubAttendance1 = subAttendanceJpaRepository.save(subAttendance1);
         SubAttendance saveSubAttendance2 = subAttendanceJpaRepository.save(subAttendance2);
-        GroupAttendence saveGroupAttendance1 = groupAttendanceJpaRepository.save(groupAttendence1);
-        GroupAttendence saveGroupAttendance2 = groupAttendanceJpaRepository.save(groupAttendence2);
+        MasterSubAttendance saveMSAttendance1 = masterSubAttendanceJpaRepository.save(masterSubAttendance1);
+        MasterSubAttendance saveMSAttendance2 = masterSubAttendanceJpaRepository.save(masterSubAttendance2);
+        GroupAttendance saveGroupAttendance1 = groupAttendanceJpaRepository.save(groupAttendance1);
+        GroupAttendance saveGroupAttendance2 = groupAttendanceJpaRepository.save(groupAttendance2);
 
         List<SubAttendance> testSubAttendanceList = subAttendanceJpaRepository.findAllAttendanceByGroupIdAndMemberId(id, id);
         SubAttendance testSubAttendance1 = testSubAttendanceList.get(0);
@@ -192,8 +219,17 @@ public class SubAttendanceRepositoryTest {
                 .group(group)
                 .build();
 
+        MasterAttendance masterAttendance = MasterAttendance.builder()
+                .masterAttandanceId(1L)
+                .day(0)
+                .date(date1)
+                .attendanceStatus(MasterAttendance.AttendanceStatus.STATUS_ATTEND)
+                .groupName(group.getGroupName())
+                .memberName("master")
+                .build();
+
         SubAttendance subAttendance1 = SubAttendance.builder()
-                .attandanceId(1L)
+                .subAttandanceId(1L)
                 .day(0)
                 .date(date1)
                 .attendanceStatus(SubAttendance.AttendanceStatus.STATUS_ATTEND)
@@ -202,7 +238,7 @@ public class SubAttendanceRepositoryTest {
                 .build();
 
         SubAttendance subAttendance2 = SubAttendance.builder()
-                .attandanceId(2L)
+                .subAttandanceId(2L)
                 .day(0)
                 .date(date2)
                 .attendanceStatus(SubAttendance.AttendanceStatus.STATUS_ATTEND)
@@ -211,7 +247,7 @@ public class SubAttendanceRepositoryTest {
                 .build();
 
         SubAttendance subAttendance3 = SubAttendance.builder()
-                .attandanceId(3L)
+                .subAttandanceId(3L)
                 .day(0)
                 .date(date3)
                 .attendanceStatus(SubAttendance.AttendanceStatus.STATUS_ATTEND)
@@ -219,19 +255,19 @@ public class SubAttendanceRepositoryTest {
                 .memberName(member.getMemberName())
                 .build();
 
-        GroupAttendence groupAttendence1 = GroupAttendence.builder()
+        GroupAttendance groupAttendance1 = GroupAttendance.builder()
                 .group(group)
-                .subAttendance(subAttendance1)
+                .masterAttendance(masterAttendance)
                 .build();
 
-        GroupAttendence groupAttendence2 = GroupAttendence.builder()
+        GroupAttendance groupAttendance2 = GroupAttendance.builder()
                 .group(group)
-                .subAttendance(subAttendance2)
+                .masterAttendance(masterAttendance)
                 .build();
 
-        GroupAttendence groupAttendence3 = GroupAttendence.builder()
+        GroupAttendance groupAttendance3 = GroupAttendance.builder()
                 .group(group)
-                .subAttendance(subAttendance3)
+                .masterAttendance(masterAttendance)
                 .build();
 
         //when
@@ -241,9 +277,9 @@ public class SubAttendanceRepositoryTest {
         SubAttendance saveSubAttendance1 = subAttendanceJpaRepository.save(subAttendance1);
         SubAttendance saveSubAttendance2 = subAttendanceJpaRepository.save(subAttendance2);
         SubAttendance saveSubAttendance3 = subAttendanceJpaRepository.save(subAttendance3);
-        GroupAttendence saveGroupAttendance1 = groupAttendanceJpaRepository.save(groupAttendence1);
-        GroupAttendence saveGroupAttendance2 = groupAttendanceJpaRepository.save(groupAttendence2);
-        GroupAttendence saveGroupAttendance3 = groupAttendanceJpaRepository.save(groupAttendence3);
+        GroupAttendance saveGroupAttendance1 = groupAttendanceJpaRepository.save(groupAttendance1);
+        GroupAttendance saveGroupAttendance2 = groupAttendanceJpaRepository.save(groupAttendance2);
+        GroupAttendance saveGroupAttendance3 = groupAttendanceJpaRepository.save(groupAttendance3);
 
         List<SubAttendance> testSubAttendanceList = subAttendanceJpaRepository.findMonthAttendanceByGroupIdAndMemberIdAndDate(id, id, 2023, 5);
         SubAttendance testSubAttendance = testSubAttendanceList.get(0);
@@ -279,6 +315,15 @@ public class SubAttendanceRepositoryTest {
                 .group(group)
                 .build();
 
+        MasterAttendance masterAttendance = MasterAttendance.builder()
+                .masterAttandanceId(1L)
+                .day(0)
+                .date(date)
+                .attendanceStatus(MasterAttendance.AttendanceStatus.STATUS_ATTEND)
+                .groupName(group.getGroupName())
+                .memberName("master")
+                .build();
+
         SubAttendance subAttendance = SubAttendance.builder()
                 .day(0)
                 .date(date)
@@ -287,9 +332,9 @@ public class SubAttendanceRepositoryTest {
                 .memberName(member.getMemberName())
                 .build();
 
-        GroupAttendence groupAttendence = GroupAttendence.builder()
+        GroupAttendance groupAttendance = GroupAttendance.builder()
                 .group(group)
-                .subAttendance(subAttendance)
+                .masterAttendance(masterAttendance)
                 .build();
 
         AttendStatus attendStatus = AttendStatus.builder()
@@ -303,7 +348,7 @@ public class SubAttendanceRepositoryTest {
         Member testMember = memberJpaRepository.save(member);
         MemberGroup testMg = memberGroupJpaRepository.save(memberGroup);
         SubAttendance testSubAttendance = subAttendanceJpaRepository.save(subAttendance);
-        GroupAttendence testGroupAttendance = groupAttendanceJpaRepository.save(groupAttendence);
+        GroupAttendance testGroupAttendance = groupAttendanceJpaRepository.save(groupAttendance);
 
         long memberId = groupJpaRepository.findMemberIdByGroupId(testGroup.getGroupId()).get(0);
 
