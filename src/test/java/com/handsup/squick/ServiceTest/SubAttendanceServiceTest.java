@@ -74,8 +74,8 @@ public class SubAttendanceServiceTest {
                 .day(0)
                 .date(date1)
                 .attendanceStatus(SubAttendance.AttendanceStatus.STATUS_ATTEND)
-                .groupName(group.getGroupName())
-                .memberName(member.getMemberName())
+                .groupId(group.getGroupId())
+                .memberId(member.getMemberId())
                 .build();
 
         SubAttendance subAttendance2 = SubAttendance.builder()
@@ -83,8 +83,8 @@ public class SubAttendanceServiceTest {
                 .day(0)
                 .date(date2)
                 .attendanceStatus(SubAttendance.AttendanceStatus.STATUS_ABSENT)
-                .groupName(group.getGroupName())
-                .memberName(member.getMemberName())
+                .groupId(group.getGroupId())
+                .memberId(member.getMemberId())
                 .build();
 
         SubAttendance subAttendance3 = SubAttendance.builder()
@@ -92,8 +92,8 @@ public class SubAttendanceServiceTest {
                 .day(0)
                 .date(date4)
                 .attendanceStatus(SubAttendance.AttendanceStatus.STATUS_LATE)
-                .groupName(group.getGroupName())
-                .memberName(member.getMemberName())
+                .groupId(group.getGroupId())
+                .memberId(member.getMemberId())
                 .build();
 
         SubAttendance subAttendance4 = SubAttendance.builder()
@@ -101,8 +101,8 @@ public class SubAttendanceServiceTest {
                 .day(0)
                 .date(date3)
                 .attendanceStatus(SubAttendance.AttendanceStatus.STATUS_LATE)
-                .groupName(group.getGroupName())
-                .memberName(member.getMemberName())
+                .groupId(group.getGroupId())
+                .memberId(member.getMemberId())
                 .build();
 
         List<SubAttendance> subAttendances = new ArrayList<>();
@@ -134,8 +134,8 @@ public class SubAttendanceServiceTest {
         String status = "ATTEND";
 
         SubAttendance subAttendance = SubAttendance.builder()
-                .memberName(memberName)
-                .groupName(groupName)
+                .groupId(1L)
+                .memberId(1L)
                 .date(date)
                 .attendanceStatus(SubAttendance.AttendanceStatus.STATUS_LATE)
                 .day(0)

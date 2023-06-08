@@ -14,11 +14,9 @@ public interface SubAttendanceJpaRepository extends JpaRepository<SubAttendance,
     SubAttendance findById(long attendanceId);
     //테스트 완
     @Query(value = "select sa from SubAttendance sa " +
-            "join MasterSubAttendance msa on sa.subAttandanceId = msa.subAttendance.subAttandanceId " +
-            "join GroupAttendance ga on msa.masterAttendance.masterAttandanceId = ga.masterAttendance.masterAttandanceId " +
-            "where ga.group.groupName = :groupName and msa.masterAttendance.memberName = :memberName and " +
+            "where sa.groupId = :groupId and sa.memberId = :memberId and " +
             "sa.date = :date")
-    SubAttendance findAttandanceByGroupNameAndMemberNameAndDate(String groupName, String memberName, LocalDate date);
+    SubAttendance findSubAttandanceByGroupIdAndMemberIdAndDate(long groupId, long memberId, LocalDate date);
 
     //테스트 완
     @Query(value = "select sa from SubAttendance sa " +

@@ -247,16 +247,16 @@ public class GroupServiceTest {
                 .day(0)
                 .date(date)
                 .attendanceStatus(SubAttendance.AttendanceStatus.STATUS_ATTEND)
-                .groupName(group.getGroupName())
-                .memberName(member1.getMemberName())
+                .groupId(group.getGroupId())
+                .memberId(member1.getMemberId())
                 .build();
 
         SubAttendance subAttendance2 = SubAttendance.builder()
                 .day(0)
                 .date(date)
                 .attendanceStatus(SubAttendance.AttendanceStatus.STATUS_ABSENT)
-                .groupName(group.getGroupName())
-                .memberName(member2.getMemberName())
+                .groupId(group.getGroupId())
+                .memberId(member2.getMemberId())
                 .build();
 
         AttendStatus attend1 = AttendStatus.builder()

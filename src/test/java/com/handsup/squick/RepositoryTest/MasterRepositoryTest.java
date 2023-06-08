@@ -83,8 +83,8 @@ public class MasterRepositoryTest {
 
         MasterAttendance masterAttendance = MasterAttendance.builder()
                 .masterAttandanceId(id)
-                .memberName("TestMember")
-                .groupName("TestGroup")
+                .memberId(member.getMemberId())
+                .groupId(group.getGroupId())
                 .date(LocalDate.now())
                 .day(1)
                 .activation(true)
@@ -106,7 +106,7 @@ public class MasterRepositoryTest {
         MasterAttendance testMasterAttendance = masterAttendances.get(0);
 
         //then
-        assertThat(masterAttendance.getGroupName(), is(equalTo(testMasterAttendance.getGroupName())));
+        assertThat(masterAttendance.getGroupId(), is(equalTo(testMasterAttendance.getGroupId())));
     }
 
     @Test
@@ -125,8 +125,8 @@ public class MasterRepositoryTest {
 
         MasterAttendance masterAttendance = MasterAttendance.builder()
                 .masterAttandanceId(id)
-                .memberName("TestMember")
-                .groupName("TestGroup")
+                .memberId(id)
+                .groupId(group.getGroupId())
                 .date(LocalDate.now())
                 .day(1)
                 .activation(true)
@@ -142,7 +142,7 @@ public class MasterRepositoryTest {
         GroupAttendance saveGA = groupAttendanceJpaRepository.save(groupAttendance);
 
         //when
-        MasterAttendance testMA = masterAttendanceJpaRepository.findMasterAttendanceByGroupNameAndDate(group.getGroupName(), LocalDate.now());
+        MasterAttendance testMA = masterAttendanceJpaRepository.findMasterAttendanceByGroupNameAndDate(group.getGroupId(), LocalDate.now());
 
         //then
         assertThat(masterAttendance.getMasterAttandanceId(), is(equalTo(testMA.getMasterAttandanceId())));
@@ -167,8 +167,8 @@ public class MasterRepositoryTest {
 
         MasterAttendance masterAttendance1 = MasterAttendance.builder()
                 .masterAttandanceId(1L)
-                .memberName("TestMember1")
-                .groupName("TestGroup")
+                .memberId(id)
+                .groupId(group.getGroupId())
                 .date(date1)
                 .day(1)
                 .activation(true)
@@ -176,8 +176,8 @@ public class MasterRepositoryTest {
 
         MasterAttendance masterAttendance2 = MasterAttendance.builder()
                 .masterAttandanceId(2L)
-                .memberName("TestMember1")
-                .groupName("TestGroup")
+                .memberId(id)
+                .groupId(group.getGroupId())
                 .date(date2)
                 .day(1)
                 .activation(true)

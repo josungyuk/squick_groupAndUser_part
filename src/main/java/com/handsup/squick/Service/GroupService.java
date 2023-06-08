@@ -131,6 +131,7 @@ public class GroupService{
         int idx = 0;
         for(long memberId : membersId){
             List<SubAttendance> subAttendances = subAttendanceJpaRepository.findGroupCurAttendStatus(date, groupId, memberId);
+            String memberName = memberJpaRepository.findMemberByMemberId(memberId).getMemberName();
 
             List<AttendStatus> attendStatuses = new ArrayList<>();
 
@@ -145,7 +146,7 @@ public class GroupService{
                     status = "LATE";
 
                 AttendStatus attendStatus = AttendStatus.builder()
-                        .memberName(subAttendance.getMemberName())
+                        .memberName(memberName)
                         .date(subAttendance.getDate())
                         .state(status)
                         .build();

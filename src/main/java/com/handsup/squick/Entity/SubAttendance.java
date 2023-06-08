@@ -36,11 +36,11 @@ public class SubAttendance {
     @Column(name = "status")
     AttendanceStatus attendanceStatus;
 
-    @Column(name = "groupName")
-    String groupName;
+    @Column(name = "groupId")
+    long groupId;
 
-    @Column(name = "memberName")
-    String memberName;
+    @Column(name = "memberId")
+    long memberId;
 
     @Column(name = "latitude")
     double latitude;

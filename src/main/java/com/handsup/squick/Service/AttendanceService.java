@@ -65,6 +65,8 @@ public class AttendanceService {
 
     //테스트 완
     public AttendCountDto getMemberDetail(long groupId, long memberId){
+        Member member = memberJpaRepository.findMemberByMemberId(memberId);
+
         List<SubAttendance> attendList = subAttendanceJpaRepository.findAllAttendanceByGroupIdAndMemberId(groupId, memberId);
 
         int attend = 0;
@@ -111,8 +113,11 @@ public class AttendanceService {
         LocalDate date = dto.getDate();
         String status = dto.getStatus();
 
-        SubAttendance subAttendance = subAttendanceJpaRepository.findAttandanceByGroupNameAndMemberNameAndDate(
-                groupName, memberName, date
+        long groupId = groupJpaRepository.findGroupByGroupName(groupName).getGroupId();
+        long memberId = memberJpaRepository.findMemberByMemberName(memberName).getMemberId();
+
+        SubAttendance subAttendance = subAttendanceJpaRepository.findSubAttandanceByGroupIdAndMemberIdAndDate(
+                groupId, memberId, date
         );
 
         switch(status){
@@ -135,11 +140,17 @@ public class AttendanceService {
         double latitude = dto.getLatitude();
         double longitude = dto.getLongitude();
 
+        String groupName = dto.getGroupName();
+        String memberName = dto.getMemberName();
+
+        long groupId = groupJpaRepository.findGroupByGroupName(groupName).getGroupId();
+        long memberId = memberJpaRepository.findMemberByMemberName(memberName).getMemberId();
+
         MasterAttendance masterAttendance = MasterAttendance.builder()
                 .date(LocalDate.now())
                 .time(LocalTime.now())
-                .memberName(dto.getMemberName())
-                .groupName(dto.getGroupName())
+                .memberId(memberId)
+                .groupId(groupId)
                 .day(1)
                 .activation(true)
                 .attendanceStatus(MasterAttendance.AttendanceStatus.STATUS_ATTEND)
@@ -174,10 +185,16 @@ public class AttendanceService {
 
         if(timeLeft <= 0 && !isRange(masterLatitude, masterLongitude, latitude, longitude)) return -1;
 
+        String groupName = dto.getGroupName();
+        String memberName = dto.getMemberName();
+
+        long subGroupId = groupJpaRepository.findGroupByGroupName(groupName).getGroupId();
+        long subMemberId = memberJpaRepository.findMemberByMemberName(memberName).getMemberId();
+
         SubAttendance subAttendance = SubAttendance.builder()
                 .date(LocalDate.now())
-                .memberName(dto.getMemberName())
-                .groupName(dto.getGroupName())
+                .memberId(subMemberId)
+                .groupId(subGroupId)
                 .day(day + 1)
                 .attendanceStatus(SubAttendance.AttendanceStatus.STATUS_ATTEND)
                 .latitude(latitude)
@@ -197,9 +214,8 @@ public class AttendanceService {
 
     public long getRemainingTime(long groupId){
         LocalDate date = LocalDate.now();
-        String groupName = groupJpaRepository.findByGroupId(groupId).getGroupName();
 
-        MasterAttendance attendance = masterAttendanceJpaRepository.findMasterAttendanceByGroupNameAndDate(groupName, date);
+        MasterAttendance attendance = masterAttendanceJpaRepository.findMasterAttendanceByGroupNameAndDate(groupId, date);
         LocalTime limit = attendance.getTime().plusMinutes(5);
         long remainingTime = ChronoUnit.SECONDS.between(limit, LocalTime.now());
 
