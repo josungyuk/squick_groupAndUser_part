@@ -44,7 +44,7 @@ public class SubAttendanceServiceTest {
     private SubAttendanceJpaRepository subAttendanceJpaRepository;
 
     @Test
-    void getMemberDetail(){
+    void getMonthMemberAttendance(){
         LocalDate date1 = LocalDate.of(2023, 5, 5);
         LocalDate date2 = LocalDate.of(2023, 4, 4);
         LocalDate date3 = LocalDate.of(2023, 7, 7);
@@ -105,11 +105,88 @@ public class SubAttendanceServiceTest {
                 .memberId(member.getMemberId())
                 .build();
 
-        List<SubAttendance> subAttendances = new ArrayList<>();
-        subAttendances.add(subAttendance1);
-        subAttendances.add(subAttendance2);
-        subAttendances.add(subAttendance3);
-        subAttendances.add(subAttendance4);
+        List<SubAttendance> list = new ArrayList<>();
+        list.add(subAttendance1);
+        list.add(subAttendance2);
+
+        int year = date1.getYear();
+        int month = date1.getMonthValue();
+
+        given(subAttendanceJpaRepository.findMonthAttendanceByGroupIdAndMemberIdAndDate(id, id, year, month)).willReturn(list);
+
+        List<SubAttendance> test = subAttendanceJpaRepository.findMonthAttendanceByGroupIdAndMemberIdAndDate(id, id, year, month);
+
+        assertThat(subAttendance1.getSubAttandanceId(), is(equalTo(test.get(0).getSubAttandanceId())));
+        assertThat(subAttendance2.getSubAttandanceId(), is(equalTo(test.get(1).getSubAttandanceId())));
+    }
+
+    @Test
+    void getMemberDetail(){
+        LocalDate date1 = LocalDate.of(2023, 5, 5);
+        LocalDate date2 = LocalDate.of(2023, 4, 4);
+        LocalDate date3 = LocalDate.of(2023, 7, 7);
+        LocalDate date4 = LocalDate.of(2023, 7, 8);
+        long id = 1L;
+
+        Group group = Group.builder()
+                .groupId(id)
+                .groupName("TestGroup")
+                .description("blabla")
+                .masterName("TestMember")
+                .img("img")
+                .invitationCode("aaaaaa")
+                .build();
+
+        Member member = Member.builder()
+                .memberId(id)
+                .memberName("Member")
+                .isPin(true)
+                .invitationStatus(Member.InvitationStatus.INVITATION_ACCEPT)
+                .email("test@test.com")
+                .img("TestImg")
+                .build();
+
+        SubAttendance subAttendance1 = SubAttendance.builder()
+                .subAttandanceId(1L)
+                .day(0)
+                .date(date1)
+                .attendanceStatus(SubAttendance.AttendanceStatus.STATUS_ATTEND)
+                .groupId(group.getGroupId())
+                .memberId(member.getMemberId())
+                .build();
+
+        SubAttendance subAttendance2 = SubAttendance.builder()
+                .subAttandanceId(2L)
+                .day(1)
+                .date(date2)
+                .attendanceStatus(SubAttendance.AttendanceStatus.STATUS_ABSENT)
+                .groupId(group.getGroupId())
+                .memberId(member.getMemberId())
+                .build();
+
+        SubAttendance subAttendance3 = SubAttendance.builder()
+                .subAttandanceId(3L)
+                .day(2)
+                .date(date3)
+                .attendanceStatus(SubAttendance.AttendanceStatus.STATUS_LATE)
+                .groupId(group.getGroupId())
+                .memberId(member.getMemberId())
+                .build();
+
+        SubAttendance subAttendance4 = SubAttendance.builder()
+                .subAttandanceId(4L)
+                .day(3)
+                .date(date4)
+                .attendanceStatus(SubAttendance.AttendanceStatus.STATUS_LATE)
+                .groupId(group.getGroupId())
+                .memberId(member.getMemberId())
+                .build();
+
+        List<SubAttendance> list = new ArrayList<>();
+        list.add(subAttendance1);
+        list.add(subAttendance2);
+        list.add(subAttendance3);
+        list.add(subAttendance4);
 
         AttendCountDto attendCountDto = AttendCountDto.builder()
                 .attend(1)
@@ -117,7 +194,7 @@ public class SubAttendanceServiceTest {
                 .late(2)
                 .build();
 
-        given(subAttendanceJpaRepository.findAllAttendanceByGroupIdAndMemberId(group.getGroupId(), member.getMemberId())).willReturn(subAttendances);
+        given(subAttendanceJpaRepository.findAllAttendanceByGroupIdAndMemberId(group.getGroupId(), member.getMemberId())).willReturn(list);
 
         AttendCountDto testDto = attendanceService.getMemberDetail(group.getGroupId(), member.getMemberId());
 
@@ -129,13 +206,13 @@ public class SubAttendanceServiceTest {
     @Test
     void updateMemberAttendance(){
         LocalDate date = LocalDate.now();
-        String groupName = "groupName";
-        String memberName = "memberName";
+        long groupId = 1L;
+        long memberId = 1L;
         String status = "ATTEND";
 
         SubAttendance subAttendance = SubAttendance.builder()
-                .groupId(1L)
-                .memberId(1L)
+                .groupId(groupId)
+                .memberId(memberId)
                 .date(date)
                 .attendanceStatus(SubAttendance.AttendanceStatus.STATUS_LATE)
                 .day(0)

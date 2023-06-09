@@ -65,8 +65,6 @@ public class AttendanceService {
 
     //테스트 완
     public AttendCountDto getMemberDetail(long groupId, long memberId){
-        Member member = memberJpaRepository.findMemberByMemberId(memberId);
-
         List<SubAttendance> attendList = subAttendanceJpaRepository.findAllAttendanceByGroupIdAndMemberId(groupId, memberId);
 
         int attend = 0;
@@ -97,7 +95,7 @@ public class AttendanceService {
     }
 
     //테스트 완
-    public List getMemberAttendance(long groupId, long memberId, LocalDate date){
+    public List getMonthMemberAttendance(long groupId, long memberId, LocalDate date){
         int year = date.getYear();
         int month = date.getMonthValue();
 
@@ -237,9 +235,9 @@ public class AttendanceService {
 
     //더 구현 필요.
     public long checkAttendance(long attendanceId, long groupId, AttendanceDto dto){
-        Pageable pageable =  PageRequest.of(0,1);
-        Page<MasterAttendance> page = masterAttendanceJpaRepository.findRecentMasterAttendanceByMasterGroupId(groupId, pageable);
-        long masterAttendanceId = page.getContent().get(0).getMasterAttandanceId();
+//        Pageable pageable =  PageRequest.of(0,1);
+//        Page<MasterAttendance> page = masterAttendanceJpaRepository.findRecentMasterAttendanceByMasterGroupId(groupId, pageable);
+//        long masterAttendanceId = page.getContent().get(0).getMasterAttandanceId();
 
         //이 부분부터 구현 필요
         SubAttendance subAttendance = subAttendanceJpaRepository.findById(attendanceId);

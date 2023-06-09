@@ -146,7 +146,7 @@ public class GroupController {
                                           @RequestParam("memberId") long memberId,
                                           @RequestParam("date") String date){
         LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
-        List<SubAttendance> response = attendanceService.getMemberAttendance(groupId, memberId, localDate);
+        List<SubAttendance> response = attendanceService.getMonthMemberAttendance(groupId, memberId, localDate);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
