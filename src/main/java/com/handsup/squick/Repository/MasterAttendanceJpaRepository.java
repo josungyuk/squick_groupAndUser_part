@@ -14,6 +14,7 @@ import java.util.List;
 
 @Repository
 public interface MasterAttendanceJpaRepository extends JpaRepository<MasterAttendance, Long> {
+    MasterAttendance findMasterAttendanceByMasterAttandanceId(long attendanceId);
     @Query("select ma from MasterAttendance ma " +
             "join GroupAttendance ga on ga.masterAttendance.masterAttandanceId = ma.masterAttandanceId " +
             "join MemberGroup mg on mg.group.groupId = ga.group.groupId " +

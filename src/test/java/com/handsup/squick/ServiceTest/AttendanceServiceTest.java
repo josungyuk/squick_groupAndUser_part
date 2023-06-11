@@ -1,9 +1,12 @@
 package com.handsup.squick.ServiceTest;
 
 import com.handsup.squick.Dto.GroupDto.Attend.AttendCountDto;
+import com.handsup.squick.Dto.GroupDto.Attend.AttendanceCreateDto;
+import com.handsup.squick.Entity.MasterAttendance;
 import com.handsup.squick.Entity.SubAttendance;
 import com.handsup.squick.Entity.Group;
 import com.handsup.squick.Entity.Member;
+import com.handsup.squick.Repository.MasterAttendanceJpaRepository;
 import com.handsup.squick.Repository.SubAttendanceJpaRepository;
 import com.handsup.squick.Repository.GroupJpaRepository;
 import com.handsup.squick.Repository.JoinRepo.MemberGroupJpaRepository;
@@ -17,17 +20,19 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @Transactional
 @ExtendWith(MockitoExtension.class)
-public class SubAttendanceServiceTest {
+public class AttendanceServiceTest {
     @InjectMocks
     private AttendanceService attendanceService;
 
@@ -42,6 +47,9 @@ public class SubAttendanceServiceTest {
 
     @Mock
     private SubAttendanceJpaRepository subAttendanceJpaRepository;
+
+    @Mock
+    private MasterAttendanceJpaRepository masterAttendanceJpaRepository;
 
     @Test
     void getMonthMemberAttendance(){
@@ -205,6 +213,7 @@ public class SubAttendanceServiceTest {
 
     @Test
     void updateMemberAttendance(){
+        //given
         LocalDate date = LocalDate.now();
         long groupId = 1L;
         long memberId = 1L;
@@ -233,8 +242,51 @@ public class SubAttendanceServiceTest {
 
         given(subAttendanceJpaRepository.save(subAttendance)).willReturn(subAttendance);
 
+        //when
         SubAttendance testSubAttendance = subAttendanceJpaRepository.save(subAttendance);
 
+        //then
         assertThat(testSubAttendance.getAttendanceStatus(), is(equalTo(SubAttendance.AttendanceStatus.STATUS_ATTEND)));
+    }
+
+    @Test
+    void createAttendanceTest(){
+        //given
+        MasterAttendance masterAttendance = MasterAttendance.builder()
+                .date(LocalDate.now())
+                .time(LocalTime.now())
+                .memberId(1L)
+                .groupId(1L)
+                .day(1)
+                .activation(true)
+                .attendanceStatus(MasterAttendance.AttendanceStatus.STATUS_ATTEND)
+                .latitude(0)
+                .longitude(0)
+                .build();
+
+        AttendanceCreateDto dto = AttendanceCreateDto.builder()
+                .groupName("testGroup")
+                .memberName("testMember")
+                .authCode("dsadsa")
+                .timeLeft(4)
+                .latitude(0)
+                .longitude(0)
+                .build();
+
+        Group group = Group.builder()
+                .groupId(1L).build();
+        Member member = Member.builder()
+                .memberId(1L)
+                .build();
+
+
+        given(groupJpaRepository.findGroupByGroupName("testGroup")).willReturn(group);
+        given(memberJpaRepository.findMemberByMemberName("testMember")).willReturn(member);
+        given(masterAttendanceJpaRepository.save(any(MasterAttendance.class))).willReturn(masterAttendance);
+
+
+        long id = attendanceService.createAttendance(dto);
+
+        assertThat(id, is(equalTo(0L)));
     }
 }
