@@ -1,13 +1,11 @@
 package com.handsup.squick.RepositoryTest;
 
-import com.handsup.squick.Entity.Group;
-import com.handsup.squick.Entity.JoinEntity.MemberGroup;
-import com.handsup.squick.Entity.Member;
-import com.handsup.squick.Repository.GroupJpaRepository;
-import com.handsup.squick.Repository.JoinRepo.MemberGroupJpaRepository;
-import com.handsup.squick.Repository.MemberJpaRepository;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
+import com.handsup.squick.group.entity.Group;
+import com.handsup.squick.group.entity.MemberGroup;
+import com.handsup.squick.member.entity.Member;
+import com.handsup.squick.group.repository.GroupJpaRepository;
+import com.handsup.squick.group.repository.MemberGroupJpaRepository;
+import com.handsup.squick.member.repository.MemberJpaRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;

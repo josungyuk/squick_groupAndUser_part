@@ -1,27 +1,33 @@
 package com.handsup.squick.ServiceTest;
 
-import com.handsup.squick.Dto.GroupDto.Attend.AttendCountDto;
-import com.handsup.squick.Dto.GroupDto.Attend.AttendanceCreateDto;
-import com.handsup.squick.Entity.MasterAttendance;
-import com.handsup.squick.Entity.SubAttendance;
-import com.handsup.squick.Entity.Group;
-import com.handsup.squick.Entity.Member;
-import com.handsup.squick.Repository.MasterAttendanceJpaRepository;
-import com.handsup.squick.Repository.SubAttendanceJpaRepository;
-import com.handsup.squick.Repository.GroupJpaRepository;
-import com.handsup.squick.Repository.JoinRepo.MemberGroupJpaRepository;
-import com.handsup.squick.Repository.MemberJpaRepository;
-import com.handsup.squick.Service.AttendanceService;
+import com.handsup.squick.group.dto.AttendCountDto;
+import com.handsup.squick.group.dto.AttendanceCreateDto;
+import com.handsup.squick.attendance.entity.MasterSubAttendance;
+import com.handsup.squick.attendance.entity.MasterAttendance;
+import com.handsup.squick.attendance.entity.SubAttendance;
+import com.handsup.squick.group.entity.Group;
+import com.handsup.squick.member.entity.Member;
+import com.handsup.squick.attendance.repository.MasterSubAttendanceJpaRepository;
+import com.handsup.squick.attendance.repository.MasterAttendanceJpaRepository;
+import com.handsup.squick.attendance.repository.SubAttendanceJpaRepository;
+import com.handsup.squick.group.repository.GroupJpaRepository;
+import com.handsup.squick.group.repository.MemberGroupJpaRepository;
+import com.handsup.squick.member.repository.MemberJpaRepository;
+import com.handsup.squick.attendance.service.AttendanceService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import static org.hamcrest.Matchers.is;
@@ -50,6 +56,9 @@ public class AttendanceServiceTest {
 
     @Mock
     private MasterAttendanceJpaRepository masterAttendanceJpaRepository;
+
+    @Mock
+    private MasterSubAttendanceJpaRepository masterSubAttendanceJpaRepository;
 
     @Test
     void getMonthMemberAttendance(){
@@ -289,4 +298,133 @@ public class AttendanceServiceTest {
 
         assertThat(id, is(equalTo(0L)));
     }
+
+    @Test
+    void bePresentTest(){
+        LocalDate date1 = LocalDate.of(2023, 5, 5);
+
+        Group group = Group.builder()
+                .groupId(1L)
+                .groupName("TestGroup")
+                .description("blabla")
+                .masterName("master")
+                .img("img")
+                .invitationCode("aaaaaa")
+                .build();
+
+        Member master = Member.builder()
+                .memberId(1L)
+                .memberName("master")
+                .isPin(true)
+                .invitationStatus(Member.InvitationStatus.INVITATION_ACCEPT)
+                .email("test@test.com")
+                .img("TestImg")
+                .build();
+
+        Member member = Member.builder()
+                .memberId(2L)
+                .memberName("Member")
+                .isPin(true)
+                .invitationStatus(Member.InvitationStatus.INVITATION_ACCEPT)
+                .email("test@test.com")
+                .img("TestImg")
+                .build();
+
+        MasterAttendance masterAttendance = MasterAttendance.builder()
+                .masterAttandanceId(1L)
+                .memberId(1L)
+                .groupId(group.getGroupId())
+                .date(LocalDate.now())
+                .day(1)
+                .activation(true)
+                .latitude(37.7749)
+                .longitude(-122.4194)
+                .build();
+
+        List<MasterAttendance> attendances = new ArrayList<>();
+        attendances.add(masterAttendance);
+
+        SubAttendance subAttendance = SubAttendance.builder()
+                .subAttandanceId(35L)
+                .day(0)
+                .date(date1)
+                .attendanceStatus(SubAttendance.AttendanceStatus.STATUS_ATTEND)
+                .groupId(group.getGroupId())
+                .memberId(member.getMemberId())
+                .build();
+
+        MasterSubAttendance masterSubAttendance = MasterSubAttendance.builder()
+                .masterAttendance(masterAttendance)
+                .subAttendance(subAttendance)
+                .build();
+
+        AttendanceCreateDto dto = AttendanceCreateDto.builder()
+                .groupName(group.getGroupName())
+                .memberName(member.getMemberName())
+                .timeLeft(5)
+                .authCode("000000")
+                .latitude(37.7760)
+                .longitude(-122.4190)
+                .build();
+
+        given(groupJpaRepository.findGroupByGroupName(any(String.class))).willReturn(group);
+        given(memberJpaRepository.findMemberByGroupIdAndMemberName(any(Long.class), any(String.class))).willReturn(master);
+        given(masterAttendanceJpaRepository.findMasterAttendanceByGroupIdAndMemberId(any(Long.class), any(Long.class))).willReturn(attendances);
+        given(memberJpaRepository.findMemberByMemberName(any(String.class))).willReturn(member);
+        given(subAttendanceJpaRepository.save(any(SubAttendance.class))).willReturn(subAttendance);
+
+        long testId = attendanceService.bePresent(dto);
+
+        assertThat(subAttendance.getSubAttandanceId(), is(equalTo(testId)));
+    }
+
+    @Test
+    void getRemainingTimeTest(){
+        LocalDate date = LocalDate.of(2023, 5, 5);
+
+        MasterAttendance masterAttendance = MasterAttendance.builder()
+                .masterAttandanceId(1L)
+                .memberId(1L)
+                .groupId(1L)
+                .date(LocalDate.now())
+                .day(1)
+                .time(LocalTime.now())
+                .activation(true)
+                .latitude(37.7749)
+                .longitude(-122.4194)
+                .build();
+
+        given(masterAttendanceJpaRepository.findMasterAttendanceByGroupIdAndDate(any(Long.class), any(LocalDate.class))).willReturn(masterAttendance);
+
+        System.out.println(attendanceService.getRemainingTime(1L));
+    }
+
+    @Test
+    void finishAttendanceTest(){
+        MasterAttendance masterAttendance = MasterAttendance.builder()
+                .masterAttandanceId(1L)
+                .memberId(1L)
+                .groupId(1L)
+                .date(LocalDate.now())
+                .day(1)
+                .time(LocalTime.now())
+                .activation(true)
+                .latitude(37.7749)
+                .longitude(-122.4194)
+                .build();
+
+        List<MasterAttendance> attendances = new LinkedList<>();
+        attendances.add(masterAttendance);
+        Page<MasterAttendance> page = new PageImpl<>(attendances);
+
+
+        given(masterAttendanceJpaRepository.findRecentMasterAttendanceByMasterGroupId(any(Long.class), any(Pageable.class))).willReturn(page);
+        given(masterAttendanceJpaRepository.save(masterAttendance)).willReturn(masterAttendance);
+
+        Long testId = attendanceService.finishAttendance(1L);
+
+        assertThat(masterAttendance.getMasterAttandanceId(), is(equalTo(testId)));
+    }
+
+
 }

@@ -1,17 +1,17 @@
 package com.handsup.squick.RepositoryTest;
 
-import com.handsup.squick.Entity.Group;
-import com.handsup.squick.Entity.JoinEntity.GroupAttendance;
-import com.handsup.squick.Entity.JoinEntity.MemberGroup;
-import com.handsup.squick.Entity.MasterAttendance;
-import com.handsup.squick.Entity.Member;
-import com.handsup.squick.Repository.GroupJpaRepository;
-import com.handsup.squick.Repository.JoinRepo.GroupAttendanceJpaRepository;
-import com.handsup.squick.Repository.JoinRepo.MasterSubAttendanceJpaRepository;
-import com.handsup.squick.Repository.JoinRepo.MemberGroupJpaRepository;
-import com.handsup.squick.Repository.MasterAttendanceJpaRepository;
-import com.handsup.squick.Repository.MemberJpaRepository;
-import com.handsup.squick.Repository.SubAttendanceJpaRepository;
+import com.handsup.squick.group.entity.Group;
+import com.handsup.squick.group.entity.GroupAttendance;
+import com.handsup.squick.group.entity.MemberGroup;
+import com.handsup.squick.attendance.entity.MasterAttendance;
+import com.handsup.squick.member.entity.Member;
+import com.handsup.squick.group.repository.GroupJpaRepository;
+import com.handsup.squick.group.repository.GroupAttendanceJpaRepository;
+import com.handsup.squick.attendance.repository.MasterSubAttendanceJpaRepository;
+import com.handsup.squick.group.repository.MemberGroupJpaRepository;
+import com.handsup.squick.attendance.repository.MasterAttendanceJpaRepository;
+import com.handsup.squick.member.repository.MemberJpaRepository;
+import com.handsup.squick.attendance.repository.SubAttendanceJpaRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -142,7 +142,7 @@ public class MasterRepositoryTest {
         GroupAttendance saveGA = groupAttendanceJpaRepository.save(groupAttendance);
 
         //when
-        MasterAttendance testMA = masterAttendanceJpaRepository.findMasterAttendanceByGroupNameAndDate(group.getGroupId(), LocalDate.now());
+        MasterAttendance testMA = masterAttendanceJpaRepository.findMasterAttendanceByGroupIdAndDate(group.getGroupId(), LocalDate.now());
 
         //then
         assertThat(masterAttendance.getMasterAttandanceId(), is(equalTo(testMA.getMasterAttandanceId())));

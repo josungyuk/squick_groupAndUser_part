@@ -1,13 +1,13 @@
 package com.handsup.squick.ServiceTest;
 
-import com.handsup.squick.Entity.Group;
-import com.handsup.squick.Entity.JoinEntity.MemberGroup;
-import com.handsup.squick.Entity.Member;
-import com.handsup.squick.Repository.SubAttendanceJpaRepository;
-import com.handsup.squick.Repository.GroupJpaRepository;
-import com.handsup.squick.Repository.JoinRepo.MemberGroupJpaRepository;
-import com.handsup.squick.Repository.MemberJpaRepository;
-import com.handsup.squick.Service.MemberService;
+import com.handsup.squick.group.entity.Group;
+import com.handsup.squick.group.entity.MemberGroup;
+import com.handsup.squick.member.entity.Member;
+import com.handsup.squick.attendance.repository.SubAttendanceJpaRepository;
+import com.handsup.squick.group.repository.GroupJpaRepository;
+import com.handsup.squick.group.repository.MemberGroupJpaRepository;
+import com.handsup.squick.member.repository.MemberJpaRepository;
+import com.handsup.squick.member.service.MemberService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
