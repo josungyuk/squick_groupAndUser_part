@@ -1,5 +1,6 @@
 package com.handsup.squick.member.service;
 
+import com.handsup.squick.group.repositoryImpl.GroupJpaRepositoryImpl;
 import com.handsup.squick.member.dto.MemberExpelDto;
 import com.handsup.squick.member.dto.ParticipationDto;
 import com.handsup.squick.group.entity.Group;
@@ -9,6 +10,7 @@ import com.handsup.squick.attendance.repository.SubAttendanceJpaRepository;
 import com.handsup.squick.group.repository.GroupJpaRepository;
 import com.handsup.squick.group.repository.MemberGroupJpaRepository;
 import com.handsup.squick.member.repository.MemberJpaRepository;
+import com.handsup.squick.member.repositoryImpl.MemberJpaRepositoryImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,24 +21,28 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberJpaRepository memberJpaRepository;
+    private final MemberJpaRepositoryImpl memberJpaRepositoryImpl;
 
     private final GroupJpaRepository groupJpaRepository;
+    private final GroupJpaRepositoryImpl groupJpaRepositoryImpl;
 
     private final SubAttendanceJpaRepository subAttendanceJpaRepository;
 
     private final MemberGroupJpaRepository memberGroupJpaRepository;
 
     public void setPin(long memberId){
-        Member member = memberJpaRepository.findMemberByMemberId(memberId);
+        Member member = memberJpaRepository.findById(memberId)
+                .orElseThrow(() -> new NullPointerException());
 
-        member.setPin(!member.isPin());
+        member.setIsPin(!member.getIsPin());
         memberJpaRepository.save(member);
     }
 
     public void expelMember(MemberExpelDto dto){
-        Member member = memberJpaRepository.findMemberByMemberName(dto.getMemberName());
+        Member member = memberJpaRepositoryImpl.findByName(dto.getMemberName())
+                .orElseThrow(() -> new NullPointerException());
 
-        long memberId = member.getMemberId();
+        long memberId = member.getId();
 
         MemberGroup memberGroup = memberGroupJpaRepository.findByMemberId(memberId);
 
@@ -46,15 +52,17 @@ public class MemberService {
 
     //테스트 완
     public List getMember(long groupId){
-        List<Member> members = memberJpaRepository.findMemberByGroupId(groupId);
+        List<Member> members = memberJpaRepositoryImpl.findByGroupId(groupId);
 
         return members;
     }
 
     //테스트 완
     public void participate(ParticipationDto dto){
-        Member member = memberJpaRepository.findMemberByMemberId(dto.getMemberId());
-        Group group = groupJpaRepository.findByGroupId(dto.getGroupId());
+        Member member = memberJpaRepositoryImpl.findById(dto.getMemberId())
+                .orElseThrow(() -> new NullPointerException());;
+        Group group = groupJpaRepositoryImpl.findById(dto.getGroupId())
+                .orElseThrow( () -> new NullPointerException());
 
         member.setInvitationStatus(Member.InvitationStatus.INVITATION_ACCEPT);
         member.setGroupName(group.getGroupName());
@@ -70,7 +78,7 @@ public class MemberService {
 
     //테스트 완
     public List getWaitMember(long groupId){
-        List<Member> members = memberJpaRepository.findMemberByGroupId(groupId);
+        List<Member> members = memberJpaRepositoryImpl.findByGroupId(groupId);
 
         List<Member> acceptMembers = new ArrayList<>();
 

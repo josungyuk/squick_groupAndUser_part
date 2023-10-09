@@ -1,5 +1,6 @@
 package com.handsup.squick.group.entity;
 
+import com.handsup.squick.config.BaseTimeEntity;
 import lombok.*;
 
 import javax.persistence.*;
@@ -13,25 +14,25 @@ import java.util.List;
 @Setter
 @Builder
 @Table(name = "`Group`")
-public class Group {
+public class Group extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "groupId")
-    long groupId;
+    Long id;
     @Column(name = "groupName")
     String groupName;
     @Column(name = "masterName")
     String masterName;
-    @Column(name = "img", length = 65536)
+    @Column(columnDefinition = "TEXT")
     String img;
     @Column(name = "description")
     String description;
     @Column(name = "invitationCode")
     String invitationCode;
     @Column(name = "isPin")
-    boolean isPin;
+    Boolean isPin;
     @Column(name = "isAlarm")
-    boolean isAlarm;
+    Boolean isAlarm;
 
 
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
@@ -34,25 +35,32 @@ public class GroupController {
     private final MemberService memberService;
     private final AttendanceService attendanceService;
 
+    @PostMapping(value = "/create")         //완
+    public ResponseEntity createGroup(@RequestPart("dto") GroupCreateDto dto,
+                                      @RequestPart("img") MultipartFile file){
+        try {
+            groupService.groupCreate(dto, file);
+        }catch (IOException e){}
+
+        return new ResponseEntity<>(true, HttpStatus.OK);
+    }
+
     @GetMapping("/")            //완
-    public ResponseEntity getGroup(@RequestHeader("AccessToken") String accessToken){
+    public ResponseEntity getGroups(){
         List<Group> response = groupService.groupRead();
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @GetMapping("/members/{groupId}")           //완
-    public ResponseEntity getMember(@RequestHeader("AccessToken") String accessToken,
-                                    @PathVariable("groupId") long groupId){
-
-        List<Group> response = memberService.getMember(groupId);
+    public ResponseEntity getMember(@PathVariable("groupId") long groupId){
+        List<Member> response = memberService.getMember(groupId);
 
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
 
     @GetMapping("/participate/{groupId}")           //완
-    public ResponseEntity getParticipate(@RequestHeader("AccessToken") String accessToken,
-                                         @PathVariable("groupId") long groupId){
+    public ResponseEntity getParticipate(@PathVariable("groupId") long groupId){
         List<Member> response = memberService.getWaitMember(groupId);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -60,8 +68,7 @@ public class GroupController {
 
 
     @PostMapping("/participate")            //완
-    public ResponseEntity participate(@RequestHeader("AccessToken") String accessToken,
-                                      @RequestBody ParticipationDto dto){
+    public ResponseEntity participate(@RequestBody ParticipationDto dto){
         boolean isAccept = dto.isAccept();
         if(!isAccept)
             return new ResponseEntity<>(false, HttpStatus.OK);
@@ -73,8 +80,7 @@ public class GroupController {
 
 
     @GetMapping("/attendance/{groupId}")            //완
-    public ResponseEntity getAttendanceStatus(@RequestHeader("AccessToken") String accessToken,
-                                              @RequestParam("date") @JsonFormat(pattern = "yyyy-MM-dd") LocalDate date,
+    public ResponseEntity getAttendanceStatus(@RequestParam("date") @JsonFormat(pattern = "yyyy-MM-dd") LocalDateTime date,
                                               @PathVariable("groupId") long groupId){
         HashMap<Integer, List<AttendStatus>> response = groupService.getAttendanceStatus(date, groupId);
 
@@ -82,29 +88,15 @@ public class GroupController {
     }
 
     @PostMapping("/members/{groupId}")          //완
-    public ResponseEntity joinGroup(@RequestHeader("AccessToken") String accessToken,
-                                    @PathVariable("groupId") long groupId,
+    public ResponseEntity joinGroup(@PathVariable("groupId") long groupId,
                                     @RequestBody MemberAddDto dto){
         boolean response = groupService.isVaildCode(groupId, dto);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-
-    @PostMapping(value = "/create")         //완
-    public ResponseEntity createGroup(@RequestHeader("AccessToken") String accessToken,
-                                 @RequestPart("dto") GroupCreateDto dto,
-                                 @RequestPart("img") MultipartFile file){
-        try {
-            groupService.groupCreate(dto, file);
-        }catch (IOException e){}
-
-        return new ResponseEntity<>(true, HttpStatus.OK);
-    }
-
     @PutMapping("/{groupId}")           //완
-    public ResponseEntity updateGroup(@RequestHeader("AccessToken") String accessToken,
-                                 @PathVariable("groupId") long groupId,
+    public ResponseEntity updateGroup(@PathVariable("groupId") long groupId,
                                  @RequestPart("dto") GroupCreateDto dto,
                                  @RequestPart("img") MultipartFile file){
         try {
@@ -115,34 +107,30 @@ public class GroupController {
     }
 
     @DeleteMapping("/members/expel")           //완
-    public ResponseEntity expelMember(@RequestHeader("AccessToken") String accessToken,
-                                      @RequestBody MemberExpelDto dto){
+    public ResponseEntity expelMember(@RequestBody MemberExpelDto dto){
         memberService.expelMember(dto);
 
         return new ResponseEntity<>(true, HttpStatus.OK);
     }
 
-    @PutMapping("members/pin/{memberId}")           //완
-    public ResponseEntity setPin(@RequestHeader("AccessToken") String accessToken,
-                  @PathVariable("memberId") long memberId){
+    @PutMapping("/members/pin/{memberId}")           //완
+    public ResponseEntity setPin(@PathVariable("memberId") long memberId){
 
         memberService.setPin(memberId);
 
         return new ResponseEntity<>(true, HttpStatus.OK);
     }
 
-    @GetMapping("members/attendance/count")         //완
-    public ResponseEntity getMemberDetail(@RequestHeader("AccessToken") String accessToken,
-                                 @RequestParam("groupId") long groupId,
+    @GetMapping("/members/attendance/count")         //완
+    public ResponseEntity getMemberDetail(@RequestParam("groupId") long groupId,
                                  @RequestParam("memberId") long memberId){
         AttendCountDto response = attendanceService.getMemberDetail(groupId, memberId);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("members/attendance")           //완
-    public ResponseEntity getMemberAttendance(@RequestHeader("AccessToken") String accessToken,
-                                          @RequestParam("groupId") long groupId,
+    @GetMapping("/members/attendance")           //완
+    public ResponseEntity getMemberAttendance(@RequestParam("groupId") long groupId,
                                           @RequestParam("memberId") long memberId,
                                           @RequestParam("date") String date){
         LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
@@ -151,9 +139,8 @@ public class GroupController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PutMapping("members/attendance/update")            //완
-    public ResponseEntity updateMemberAttendance(@RequestHeader("AccessToken") String accessToken,
-                                                 @RequestBody AttendanceUpdateDto dto){
+    @PutMapping("/members/attendance/update")            //완
+    public ResponseEntity updateMemberAttendance(@RequestBody AttendanceUpdateDto dto){
         boolean response = attendanceService.updateMemberAttendance(dto);
 
         return new ResponseEntity<>(response, HttpStatus.OK);

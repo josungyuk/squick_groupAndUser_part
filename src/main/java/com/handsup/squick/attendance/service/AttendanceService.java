@@ -2,12 +2,15 @@ package com.handsup.squick.attendance.service;
 
 import com.handsup.squick.attendance.dto.AttendanceDto;
 import com.handsup.squick.attendance.dto.AttendanceUpdateDto;
+import com.handsup.squick.attendance.repositoryImpl.MasterAttendanceJpaRepositoryImpl;
+import com.handsup.squick.attendance.repositoryImpl.SubAttendanceJpaRepositoryImpl;
 import com.handsup.squick.group.dto.AttendCountDto;
 import com.handsup.squick.group.dto.AttendanceCreateDto;
 import com.handsup.squick.attendance.entity.MasterSubAttendance;
 import com.handsup.squick.attendance.entity.MasterAttendance;
 import com.handsup.squick.attendance.entity.SubAttendance;
 import com.handsup.squick.group.entity.Group;
+import com.handsup.squick.group.repositoryImpl.GroupJpaRepositoryImpl;
 import com.handsup.squick.member.entity.Member;
 import com.handsup.squick.attendance.repository.MasterSubAttendanceJpaRepository;
 import com.handsup.squick.attendance.repository.MasterAttendanceJpaRepository;
@@ -15,6 +18,7 @@ import com.handsup.squick.attendance.repository.SubAttendanceJpaRepository;
 import com.handsup.squick.group.repository.GroupJpaRepository;
 import com.handsup.squick.group.repository.MemberGroupJpaRepository;
 import com.handsup.squick.member.repository.MemberJpaRepository;
+import com.handsup.squick.member.repositoryImpl.MemberJpaRepositoryImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -22,19 +26,22 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class AttendanceService {
-    private final MemberJpaRepository memberJpaRepository;
+    private final MemberJpaRepositoryImpl memberJpaRepositoryImpl;
 
-    private final GroupJpaRepository groupJpaRepository;
+    private final GroupJpaRepositoryImpl groupJpaRepositoryImpl;
 
     private final SubAttendanceJpaRepository subAttendanceJpaRepository;
+    private final SubAttendanceJpaRepositoryImpl subAttendanceJpaRepositoryImpl;
 
     private final MasterAttendanceJpaRepository masterAttendanceJpaRepository;
+    private final MasterAttendanceJpaRepositoryImpl masterAttendanceJpaRepositoryImpl;
 
     private final MasterSubAttendanceJpaRepository masterSubAttendanceJpaRepository;
 
@@ -64,7 +71,7 @@ public class AttendanceService {
 
     //테스트 완
     public AttendCountDto getMemberDetail(long groupId, long memberId){
-        List<SubAttendance> attendList = subAttendanceJpaRepository.findAllAttendanceByGroupIdAndMemberId(groupId, memberId);
+        List<SubAttendance> attendList = subAttendanceJpaRepositoryImpl.findByGroupIdAndMemberId(groupId, memberId);
 
         int attend = 0;
         int absent = 0;
@@ -98,7 +105,7 @@ public class AttendanceService {
         int year = date.getYear();
         int month = date.getMonthValue();
 
-        List<SubAttendance> subAttendances = subAttendanceJpaRepository.findMonthAttendanceByGroupIdAndMemberIdAndDate(groupId, memberId, year, month);
+        List<SubAttendance> subAttendances = subAttendanceJpaRepositoryImpl.findMonthByGroupIdAndMemberIdAndDate(groupId, memberId, year, month);
 
         return subAttendances;
     }
@@ -107,15 +114,19 @@ public class AttendanceService {
     public boolean updateMemberAttendance(AttendanceUpdateDto dto){
         String groupName = dto.getGroupName();
         String memberName = dto.getMemberName();
-        LocalDate date = dto.getDate();
+        LocalDateTime date = dto.getDate();
         String status = dto.getStatus();
 
-        long groupId = groupJpaRepository.findGroupByGroupName(groupName).getGroupId();
-        long memberId = memberJpaRepository.findMemberByMemberName(memberName).getMemberId();
+        long groupId = groupJpaRepositoryImpl.findByName(groupName)
+                .orElseThrow( () -> new NullPointerException())
+                .getId();
+        long memberId = memberJpaRepositoryImpl.findByName(memberName)
+                .orElseThrow( () -> new NullPointerException())
+                .getId();
 
-        SubAttendance subAttendance = subAttendanceJpaRepository.findSubAttandanceByGroupIdAndMemberIdAndDate(
-                groupId, memberId, date
-        );
+        SubAttendance subAttendance = subAttendanceJpaRepositoryImpl.findMonthByGroupIdAndMemberIdAndDate(
+                groupId, memberId, date.getYear(), date.getMonthValue()
+        ).get(0);
 
         switch(status){
             case "ATTEND":
@@ -140,12 +151,14 @@ public class AttendanceService {
         String groupName = dto.getGroupName();
         String memberName = dto.getMemberName();
 
-        long groupId = groupJpaRepository.findGroupByGroupName(groupName).getGroupId();
-        long memberId = memberJpaRepository.findMemberByMemberName(memberName).getMemberId();
+        long groupId = groupJpaRepositoryImpl.findByName(groupName)
+                .orElseThrow( () -> new NullPointerException())
+                .getId();
+        long memberId = memberJpaRepositoryImpl.findByName(memberName)
+                .orElseThrow( () -> new NullPointerException())
+                .getId();
 
         MasterAttendance masterAttendance = MasterAttendance.builder()
-                .date(LocalDate.now())
-                .time(LocalTime.now())
                 .memberId(memberId)
                 .groupId(groupId)
                 .day(1)
@@ -157,7 +170,7 @@ public class AttendanceService {
 
         MasterAttendance saveMasterAttendance = masterAttendanceJpaRepository.save(masterAttendance);
 
-        return saveMasterAttendance.getMasterAttandanceId();
+        return saveMasterAttendance.getId();
     }
 
     public long bePresent(AttendanceCreateDto dto){
@@ -165,13 +178,15 @@ public class AttendanceService {
         double longitude = dto.getLongitude();
         int timeLeft = dto.getTimeLeft();
 
-        Group group = groupJpaRepository.findGroupByGroupName(dto.getGroupName());
-        Member master = memberJpaRepository.findMemberByGroupIdAndMemberName(group.getGroupId(), group.getMasterName());
+        Group group = groupJpaRepositoryImpl.findByName(dto.getGroupName())
+                .orElseThrow( () -> new NullPointerException());
+        Member master = memberJpaRepositoryImpl.findByNameAndGroupId(group.getMasterName(), group.getId())
+                .orElseThrow( () -> new NullPointerException());
 
-        long groupId = group.getGroupId();
-        long masterId = master.getMemberId();
+        long groupId = group.getId();
+        long masterId = master.getId();
 
-        List<MasterAttendance> masterAttendances = masterAttendanceJpaRepository.findMasterAttendanceByGroupIdAndMemberId(groupId, masterId);
+        List<MasterAttendance> masterAttendances = masterAttendanceJpaRepositoryImpl.findByGroupIdAndMemberId(groupId, masterId);
         MasterAttendance masterAttendance = masterAttendances.get(masterAttendances.size() - 1);
 
         if(!masterAttendance.isActivation()) return -1;
@@ -184,10 +199,11 @@ public class AttendanceService {
 
         String memberName = dto.getMemberName();
 
-        long subMemberId = memberJpaRepository.findMemberByMemberName(memberName).getMemberId();
+        long subMemberId = memberJpaRepositoryImpl.findByName(memberName)
+                .orElseThrow( () -> new NullPointerException())
+                .getId();
 
         SubAttendance subAttendance = SubAttendance.builder()
-                .date(LocalDate.now())
                 .memberId(subMemberId)
                 .groupId(groupId)
                 .day(day + 1)
@@ -204,14 +220,15 @@ public class AttendanceService {
         SubAttendance saveSubAttendance = subAttendanceJpaRepository.save(subAttendance);
         masterSubAttendanceJpaRepository.save(masterSubAttendance);
 
-        return saveSubAttendance.getSubAttandanceId();
+        return saveSubAttendance.getId();
     }
 
     public long getRemainingTime(long groupId){
-        LocalDate date = LocalDate.now();
+        LocalDateTime date = LocalDateTime.now();
 
-        MasterAttendance attendance = masterAttendanceJpaRepository.findMasterAttendanceByGroupIdAndDate(groupId, date);
-        LocalTime limit = attendance.getTime().plusMinutes(5);
+        MasterAttendance attendance = masterAttendanceJpaRepositoryImpl.findByGroupIdAndDate(groupId, date)
+                .orElseThrow( () -> new NullPointerException());
+        LocalTime limit = attendance.getCreated().toLocalTime().plusMinutes(5);
         long remainingTime = ChronoUnit.SECONDS.between(LocalTime.now(),limit);
 
         if(remainingTime < 0) remainingTime = -1;
@@ -221,7 +238,7 @@ public class AttendanceService {
 
     public long finishAttendance(long groupId){
         Pageable pageable = PageRequest.of(0,1);
-        Page<MasterAttendance> page = masterAttendanceJpaRepository.findRecentMasterAttendanceByMasterGroupId(groupId, pageable);
+        Page<MasterAttendance> page = masterAttendanceJpaRepositoryImpl.findByMasterGroupId(groupId, pageable);
         MasterAttendance masterAttendance = page.getContent().get(0);
 
         if(masterAttendance == null) return -1;
@@ -229,7 +246,7 @@ public class AttendanceService {
         masterAttendance.setActivation(false);
         MasterAttendance result = masterAttendanceJpaRepository.save(masterAttendance);
 
-        return result.getMasterAttandanceId();
+        return result.getId();
     }
 
     //더 구현 필요.
@@ -239,10 +256,11 @@ public class AttendanceService {
 //        long masterAttendanceId = page.getContent().get(0).getMasterAttandanceId();
 
         //이 부분부터 구현 필요
-        SubAttendance subAttendance = subAttendanceJpaRepository.findById(attendanceId);
+        SubAttendance subAttendance = subAttendanceJpaRepository.findById(attendanceId)
+                .orElseThrow( () -> new NullPointerException());
 
         if(subAttendance == null) return -1;
 
-        return subAttendance.getSubAttandanceId();
+        return subAttendance.getId();
     }
 }

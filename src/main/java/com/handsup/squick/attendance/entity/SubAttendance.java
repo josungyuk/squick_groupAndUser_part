@@ -1,6 +1,7 @@
 package com.handsup.squick.attendance.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.handsup.squick.config.BaseTimeEntity;
 import lombok.*;
 
 import javax.persistence.*;
@@ -16,20 +17,13 @@ import java.util.List;
 @Setter
 @Builder
 @Table(name = "SubAttendance")
-public class SubAttendance {
+public class SubAttendance extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "subAttendanceId")
-    long subAttandanceId;
+    @Column(name = "id")
+    long id;
     @Column(name = "day")
     int day;
-    @Column(name = "date")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    LocalDate date;
-
-    @Column(name = "time")
-    @JsonFormat(pattern = "kk:mm:ss")
-    LocalTime time;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")

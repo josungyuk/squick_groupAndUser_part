@@ -1,6 +1,7 @@
 package com.handsup.squick.attendance.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.handsup.squick.config.BaseTimeEntity;
 import com.handsup.squick.group.entity.GroupAttendance;
 import lombok.*;
 
@@ -17,20 +18,14 @@ import java.util.List;
 @Setter
 @Builder
 @Table(name = "MasterAttendance")
-public class MasterAttendance {
+public class MasterAttendance extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "masterAttandanceId")
-    long masterAttandanceId;
+    @Column(name = "id")
+    long id;
     @Column(name = "day")
     int day;
-    @Column(name = "date")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    LocalDate date;
 
-    @Column(name = "time")
-    @JsonFormat(pattern = "kk:mm:ss")
-    LocalTime time;
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     AttendanceStatus attendanceStatus;

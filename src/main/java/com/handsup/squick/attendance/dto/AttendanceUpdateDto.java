@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -16,7 +17,7 @@ public class AttendanceUpdateDto {
     String memberName;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    LocalDate date;
+    LocalDateTime date;
 
     String status;
 }

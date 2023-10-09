@@ -1,6 +1,7 @@
 package com.handsup.squick.member.entity;
 
 import com.handsup.squick.attendance.entity.MemberAttendance;
+import com.handsup.squick.config.BaseTimeEntity;
 import com.handsup.squick.group.entity.MemberGroup;
 import lombok.*;
 
@@ -15,27 +16,27 @@ import java.util.List;
 @Setter
 @Builder
 @Table(name = "Member")
-public class Member {
+public class Member extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "memberId")
-    long memberId;
+    Long id;
 
     @Column(name = "memberName")
-    String memberName;
+    String username;
 
     @Column(name = "groupName")
     String groupName;
 
     @Column(name = "isPin")
-    boolean isPin;
+    Boolean isPin;
 
     @Enumerated(value = EnumType.STRING)
     @Column(name = "invitationStatus")
     InvitationStatus invitationStatus = InvitationStatus.INVITATION_WAIT;
     @Column(name = "email")
     String email;
-    @Column(name = "img", length = 65546)
+    @Column(name = "img", columnDefinition = "TEXT")
     String img;
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

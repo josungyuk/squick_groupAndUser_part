@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface MemberGroupJpaRepository extends JpaRepository<MemberGroup, Long> {
 
     @Query(value = "select mg from MemberGroup mg " +
-            "where mg.member.memberId = :memberId")
+            "where mg.member.id = :memberId")
     MemberGroup findByMemberId(long memberId);
 }
